@@ -228,7 +228,7 @@ If you use this code or data in your research, please cite:
   title={Machine Learning-Accelerated Screening of Metal-Organic Frameworks 
          for Pre-combustion CO$_2$/H$_2$ Separation: Multi-target Prediction, 
          Uncertainty Quantification, and Pareto-Optimal Candidate Identification},
-  author={Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Kus, Recai},
+  author={Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Hossain, Sujan},
   journal={npj Computational Materials},
   year={2025},
   publisher={Nature Publishing Group}
