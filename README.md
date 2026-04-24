@@ -7,7 +7,7 @@
 
 **Paper:** Machine Learning-Accelerated Screening of Metal-Organic Frameworks for Pre-combustion CO₂/H₂ Separation: Multi-target Prediction, Uncertainty Quantification, and Pareto-Optimal Candidate Identification
 
-**Authors:** Md. Rifat Khandaker, Prof. Dr. Mohammad Asaduzzaman Chowdhury,
+**Authors:** Md. Rifat Khandaker, Prof. Dr. Mohammad Asaduzzaman Chowdhury, Sujan Hossain.
 
 **Target journal:** *npj Computational Materials*
 
