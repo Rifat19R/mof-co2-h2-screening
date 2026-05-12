@@ -1,10 +1,3 @@
-"""
-03_uncertainty.py
-==================
-Conformal prediction calibration using a held-out calibration set.
-Produces calibrated 80% prediction intervals for all 4 targets.
-Output: data/conformal_deltas.json, figures/uncertainty_calibration.png
-"""
 import json, warnings
 from pathlib import Path
 import numpy as np
