@@ -1,12 +1,3 @@
-"""
-04_shap_analysis.py
-====================
-SHAP TreeExplainer for all 4 XGBoost models.
-Produces beeswarm plots (top 20 features) and a summary bar chart.
-Output: figures/fig_shap_{target}.png, data/shap_importance.json
-
-Requires: pip install shap --break-system-packages
-"""
 import json, warnings
 from pathlib import Path
 import numpy as np
