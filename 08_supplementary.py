@@ -1,35 +1,3 @@
-"""
-08_supplementary.py
-====================
-Generates all supplementary tables as CSV + LaTeX and compiles
-a supplementary.tex document ready for journal submission.
-
-IMPORTANT — selectivity model note:
-  xgb_selectivity_co2h2.json was trained on log1p-transformed targets.
-  np.expm1() is applied before all selectivity analyses in physical units.
-
-Tables generated:
-  S1 — XGBoost hyperparameters (all 4 targets)
-  S2 — Model performance (R², MAE, RMSE on test set)
-  S3 — Baseline model comparison (Ridge, RF, MLP, XGBoost)
-  S4 — Top-50 MOF candidates (unified multi-objective score)
-  S5 — Pareto-optimal MOFs (working capacity vs. selectivity)
-  S6 — Top-k retrieval precision and recall
-  S7 — Conformal prediction interval half-widths
-  S8 — SHAP-based feature block importance (%)
-
-Outputs:
-  supplementary/tables/s1_hyperparameters.csv  (+ .tex)
-  supplementary/tables/s2_performance.csv      (+ .tex)
-  supplementary/tables/s3_baseline.csv         (+ .tex)
-  supplementary/tables/s4_top50_candidates.csv (+ .tex)
-  supplementary/tables/s5_pareto_front.csv     (+ .tex)
-  supplementary/tables/s6_topk.csv             (+ .tex)
-  supplementary/tables/s7_conformal.csv        (+ .tex)
-  supplementary/tables/s8_feature_blocks.csv   (+ .tex)
-  supplementary/supplementary.tex
-"""
-
 import json, warnings
 from pathlib import Path
 
