@@ -1,25 +1,3 @@
-"""
-06_pareto_analysis.py
-======================
-Multi-objective screening analysis for the ARC-MOF CO2/H2 study.
-
-1. Pareto front: working capacity vs. CO2/H2 selectivity
-2. Unified score ranking (top 50 candidates)
-3. Top-k retrieval: precision@k and recall@k vs. GCMC ground truth
-
-IMPORTANT — selectivity model note:
-  The selectivity model (xgb_selectivity_co2h2.json) was trained on
-  log1p-transformed targets in 02b_improve_selectivity_hoa.py.
-  Raw predictions must be back-transformed via np.expm1() before
-  any analysis in physical units.
-
-Outputs:
-  data/top_candidates.csv
-  data/topk_results.json
-  figures/fig_pareto.png
-  figures/fig_topk.png
-"""
-
 import json, warnings
 from pathlib import Path
 
