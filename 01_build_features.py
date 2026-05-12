@@ -1,20 +1,3 @@
-"""
-01_build_features.py
-=====================
-Merges geometric features (from arcmof_co2_features.parquet) with:
-  - RAC descriptors  (RACs.csv)       → PCA-reduced to 20 components
-  - RDF descriptors  (RDFs.csv)       → PCA-reduced to 20 components
-  - REPEAT charges   (repeat_charge_stats.parquet) → 7 stats columns
-
-ID normalisation (all → base mof_id format, e.g. DB0-m2_o1_o10_f0_pcu.sym.66):
-  RACs     : filename        e.g. DB1-Cu2O8.cif        → strip .cif
-  RDFs     : Structure_Name  e.g. DB0-m29_repeat.cif   → strip .cif + _repeat
-  Charges  : mof_id          e.g. DB0-m12_o10_repeat   → strip _repeat
-  Base     : mof_id          e.g. DB0-m2_o1_pcu.sym.66 → already clean
-
-Output: data/full_features.parquet
-"""
-
 import warnings
 from pathlib import Path
 
