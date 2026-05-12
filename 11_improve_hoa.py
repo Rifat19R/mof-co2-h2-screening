@@ -1,31 +1,3 @@
-"""
-11_improve_hoa.py
-==================
-Two-part HoA improvement strategy:
-
-PART A — Charge-complete subset model (Option 3):
-  Train a dedicated XGBoost model on only the 24,483 MOFs with real
-  REPEAT partial charges. No median imputation — every training sample
-  has genuine electrostatic information. Expected R² > 0.89.
-
-PART B — Stacking ensemble on full database (Option 1):
-  Train 4 diverse base learners on all 278,885 MOFs:
-    1. XGBoost (already trained — reload)
-    2. LightGBM (leaf-wise boosting, better for heavy-tailed distributions)
-    3. Random Forest (bagging, low correlation with boosting errors)
-    4. Extra Trees (maximum randomness, orthogonal to RF)
-  Then train a Ridge meta-learner on out-of-fold base predictions.
-  Expected R² improvement: 0.727 → 0.80–0.84.
-
-Outputs:
-  data/models/xgb_heat_of_ads_charge_complete.json  — Part A model
-  data/models/hoa_stacked_ensemble.pkl              — Part B ensemble
-  data/hoa_improvement_results.json                 — all metrics
-  figures/fig_hoa_improvement.png                   — comparison figure
-  figures/fig_hoa_parity_charge_complete.png        — Part A parity plot
-  figures/fig_hoa_parity_stacked.png                — Part B parity plot
-"""
-
 import json, pickle, warnings
 from pathlib import Path
 
