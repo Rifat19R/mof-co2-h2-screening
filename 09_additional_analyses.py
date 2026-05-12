@@ -1,20 +1,3 @@
-"""
-09_patch_remaining.py
-======================
-Runs only the figures that failed/didn't run yet:
-  - fig_parity_with_intervals  (fixed errorbar bug)
-  - fig_wc_vs_uptake_density
-  - fig_selectivity_by_topology
-  - fig_learning_curves_all
-  - fig_shap_interaction
-  - fig_top_candidate_radar
-  - fig_screening_funnel
-
-Already completed (skip):
-  fig_hoa_vs_charges, fig_hoa_error_by_charge, fig_hoa_by_metal,
-  fig_correlation_heatmap, fig_error_by_database
-"""
-
 import json, warnings
 from pathlib import Path
 
@@ -53,11 +36,43 @@ TARGET_SHORT = {
 COLORS = ["#1f77b4","#ff7f0e","#2ca02c","#d62728"]
 SKIP   = set(TARGETS + ["mof_id","co2_uptake_wt_pct","co2_uptake_vol","wc_wt_pct"])
 
+
 def save(fig, name):
     path = FIGS / f"{name}.png"
     fig.savefig(path, dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"  ✓ {name}.png")
+
+
+def bootstrap_median_ci(data, n_bootstrap=1000, ci=0.95, seed=42):
+    """
+    Compute bootstrap confidence interval around the median.
+
+    Parameters
+    ----------
+    data        : array-like of values for one group
+    n_bootstrap : number of bootstrap resamples (default 1000)
+    ci          : confidence level (default 0.95 → 95% CI)
+    seed        : random seed for reproducibility
+
+    Returns
+    -------
+    (lo, hi) : lower and upper CI bounds
+    """
+    data = np.asarray(data, dtype=float)
+    data = data[np.isfinite(data)]
+    if len(data) == 0:
+        return np.nan, np.nan
+    rng = np.random.default_rng(seed)
+    boot_medians = np.array([
+        np.median(rng.choice(data, size=len(data), replace=True))
+        for _ in range(n_bootstrap)
+    ])
+    alpha = (1.0 - ci) / 2.0
+    lo = np.percentile(boot_medians, alpha * 100)
+    hi = np.percentile(boot_medians, (1.0 - alpha) * 100)
+    return lo, hi
+
 
 # ── Load ──────────────────────────────────────────────────────────────────────
 print("Loading...")
@@ -113,7 +128,7 @@ for i, tgt in enumerate(TARGETS):
     y_s = y_v[idx_s]; p_s = p_v[idx_s]
     lo_s = lo_cal[idx_s]; hi_s = hi_cal[idx_s]
 
-    # FIX: clip error bars so they are always non-negative
+    # clip error bars so they are always non-negative
     err_lo = np.clip(p_s - lo_s, 0, None)
     err_hi = np.clip(hi_s - p_s, 0, None)
 
@@ -178,30 +193,72 @@ fig.tight_layout(rect=[0,0,1,0.95])
 save(fig, "fig_wc_vs_uptake_density")
 
 
-# ── P2-5: Selectivity by Topology ────────────────────────────────────────────
-print("P2-5: Selectivity by topology")
+# ── P2-5: Selectivity by Topology — FIXED (95% bootstrap CIs) ────────────────
+print("P2-5: Selectivity by topology (bootstrap CIs)")
 
-topo_sel = (df[df["selectivity_co2h2"].notna()]
-            .groupby("topology")["selectivity_co2h2"]
-            .agg(median="median", count="count", std="std")
-            .query("count >= 200")
-            .sort_values("median", ascending=False)
-            .head(15))
+# Step 1: identify top 15 topologies with >=200 structures
+topo_counts = (df[df["selectivity_co2h2"].notna()]
+               .groupby("topology")["selectivity_co2h2"]
+               .count()
+               .rename("count"))
 
+top15_topos = (topo_counts[topo_counts >= 200]
+               .sort_values(ascending=False))
+
+topo_medians = (df[df["selectivity_co2h2"].notna()]
+                .groupby("topology")["selectivity_co2h2"]
+                .median()
+                .rename("median"))
+
+topo_summary = pd.concat([topo_medians, topo_counts], axis=1)
+topo_summary = (topo_summary[topo_summary["count"] >= 200]
+                .sort_values("median", ascending=False)
+                .head(15))
+
+# Step 2: compute 95% bootstrap CIs for each topology median
+print(f"  Computing bootstrap CIs for {len(topo_summary)} topologies "
+      f"(1,000 resamples each)...")
+
+ci_lo = []
+ci_hi = []
+for topo in topo_summary.index:
+    vals = (df.loc[df["topology"] == topo, "selectivity_co2h2"]
+              .dropna().values)
+    lo, hi = bootstrap_median_ci(vals, n_bootstrap=1000, ci=0.95, seed=42)
+    ci_lo.append(lo)
+    ci_hi.append(hi)
+    print(f"    {topo} (n={len(vals):,}): median={np.median(vals):.1f} "
+          f"  95% CI [{lo:.1f}, {hi:.1f}]")
+
+topo_summary["ci_lo"] = ci_lo
+topo_summary["ci_hi"] = ci_hi
+
+# Step 3: asymmetric error bars from CI
+err_lo_vals = topo_summary["median"] - topo_summary["ci_lo"]
+err_hi_vals = topo_summary["ci_hi"] - topo_summary["median"]
+
+# Step 4: plot
 fig, ax = plt.subplots(figsize=(12, 6))
-x = np.arange(len(topo_sel))
-col = plt.cm.RdYlGn(np.linspace(0.2, 0.9, len(topo_sel)))
-ax.bar(x, topo_sel["median"], yerr=topo_sel["std"],
+x   = np.arange(len(topo_summary))
+col = plt.cm.RdYlGn(np.linspace(0.2, 0.9, len(topo_summary)))
+
+ax.bar(x, topo_summary["median"],
+       yerr=[err_lo_vals.values, err_hi_vals.values],
        color=col, alpha=0.85, edgecolor="white",
        capsize=4, error_kw={"lw": 1.2})
+
 ax.set_xticks(x)
-ax.set_xticklabels([f"{t}\n(n={topo_sel.loc[t,'count']:,})"
-                    for t in topo_sel.index],
-                   rotation=30, ha="right", fontsize=9)
+ax.set_xticklabels(
+    [f"{t}\n(n={topo_summary.loc[t,'count']:,})"
+     for t in topo_summary.index],
+    rotation=30, ha="right", fontsize=9)
 ax.set_ylabel(r"Median CO$_2$/H$_2$ Selectivity", fontsize=11)
-ax.set_title("CO₂/H₂ Selectivity by MOF Topology (Top 15, ≥200 structures)\n"
-             "Topology systematically controls separation performance",
-             fontweight="bold")
+ax.set_title(
+    "CO₂/H₂ Selectivity by MOF Topology (Top 15, ≥200 structures)\n"
+    "Topology systematically controls separation performance\n"
+    "Error bars: 95% bootstrap confidence intervals (1,000 resamples)",
+    fontweight="bold")
+
 fig.tight_layout()
 save(fig, "fig_selectivity_by_topology")
 
