@@ -1,17 +1,3 @@
-"""
-05b_fix_external_validation.py
-================================
-Fixes two issues in fig_external_validation.png:
-
-  1. Selectivity predictions are in log space (model retrained with log1p
-     in 02b_improve_selectivity_hoa.py) — must apply expm1 back-transform.
-
-  2. Adds a diagnostic table showing how many CoRE features matched
-     ARC-MOF features, so the distribution narrowness is explained.
-
-Also regenerates the figure with better axis limits and annotations.
-"""
-
 import json, warnings
 from pathlib import Path
 
