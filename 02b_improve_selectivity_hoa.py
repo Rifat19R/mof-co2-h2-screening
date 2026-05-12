@@ -1,33 +1,3 @@
-"""
-02b_improve_selectivity_hoa.py
-================================
-Targeted improvements for the two underperforming targets:
-
-SELECTIVITY (R²=0.80 → target >0.90):
-  Problem : CO2/H2 selectivity spans 1–200+, heavily right-skewed.
-            XGBoost trained on raw values is dominated by the long tail.
-  Fix 1   : log1p-transform target before training, exp-transform predictions.
-  Fix 2   : Increase Optuna trials to 60 for better hyperparameter coverage.
-  Fix 3   : Add log-transformed geometric features as extra descriptors.
-
-HEAT OF ADSORPTION (R²=0.72 → target >0.84):
-  Problem : HoA is driven by electrostatic interactions (partial charges).
-            Only 8.8% of MOFs have real REPEAT charges; the rest have
-            median-filled zeros which add noise for this specific target.
-  Fix 1   : Train on the 24,483 MOF subset with REAL charges only.
-  Fix 2   : Use all 7 charge features raw (not PCA-reduced).
-  Fix 3   : Increase Optuna trials on smaller dataset (faster per trial).
-
-Output:
-  data/models/xgb_selectivity_co2h2.json        (replaces old model)
-  data/models/xgb_selectivity_co2h2_q10.json
-  data/models/xgb_selectivity_co2h2_q90.json
-  data/models/xgb_heat_of_ads.json              (replaces old model)
-  data/models/xgb_heat_of_ads_q10.json
-  data/models/xgb_heat_of_ads_q90.json
-  data/metrics_improved.json
-"""
-
 import json, warnings
 from pathlib import Path
 
