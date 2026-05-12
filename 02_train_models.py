@@ -1,17 +1,3 @@
-"""
-02_train_models.py
-===================
-Trains XGBoost regressors (Optuna-tuned) for all 4 targets.
-Also trains quantile models for uncertainty estimation.
-
-Output:
-  data/models/xgb_{target}.json        — point estimate models
-  data/models/xgb_{target}_q10.json    — 10th percentile quantile model
-  data/models/xgb_{target}_q90.json    — 90th percentile quantile model
-  data/metrics.json                     — R², MAE, RMSE for all targets
-  data/train_test_idx.npz               — fixed split indices
-"""
-
 import json
 import warnings
 from pathlib import Path
