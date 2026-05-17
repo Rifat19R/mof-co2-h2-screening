@@ -1,267 +1,262 @@
-# ML-Accelerated Screening of MOFs for Pre-combustion CO₂/H₂ Separation
+# Packing Efficiency Governs CO₂/H₂ Selectivity in Metal–Organic Frameworks
 
-[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![XGBoost](https://img.shields.io/badge/model-XGBoost-orange.svg)](https://xgboost.readthedocs.io/)
-[![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+**Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals Topology-Level Reticular Design Rules**
 
-**Paper:** Machine Learning-Accelerated Screening of Metal-Organic Frameworks for Pre-combustion CO₂/H₂ Separation: Multi-target Prediction, Uncertainty Quantification, and Pareto-Optimal Candidate Identification
+[![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
+[![Data: CC BY 4.0](https://img.shields.io/badge/Data-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![Journal](https://img.shields.io/badge/Journal-Communications%20Chemistry-green.svg)](https://www.nature.com/commschem/)
 
-**Authors:** Md. Rifat Khandaker, Prof. Dr. Mohammad Asaduzzaman Chowdhury, Sujan Hossain.
-
-**Target journal:** *npj Computational Materials*
+> **Md. Rifat Khandaker\*, Mohammad Asaduzzaman Chowdhury, Sujan Hossain**  
+> Department of Chemical Engineering, DUET, Gazipur-1700, Bangladesh  
+> \*Corresponding: rifatkh.duet@gmail.com
 
 ---
 
 ## Overview
 
-This repository contains the complete pipeline for ML-accelerated screening of **278,885 ARC-MOF structures** for pre-combustion CO₂/H₂ separation. We simultaneously predict four adsorption properties using XGBoost regressors trained on a 77-dimensional descriptor space, with conformal prediction uncertainty quantification and SHAP interpretability.
+This repository contains all code, processed data, and trained models for the large-scale ML screening of 278,778 hypothetical MOF structures from the [ARC-MOF database](https://doi.org/10.1021/acs.chemmater.1c03517) for pre-combustion CO₂/H₂ separation at **40 bar, 298 K**.
 
-### Key Results
+### Key results at a glance
 
-| Target | R² | MAE | Model |
-|---|---|---|---|
-| CO₂ Uptake | **0.979** | 0.610 mmol/g | XGBoost |
-| Working Capacity | **0.983** | 0.610 mmol/g | XGBoost |
-| CO₂/H₂ Selectivity | **0.970** (log space) | — | XGBoost |
-| Heat of Adsorption | **0.768** | 0.557 kJ/mol | Stacking Ensemble |
+| Target | R² (test set) | MAE |
+|---|---|---|
+| CO₂ uptake | 0.981 | 0.564 mmol g⁻¹ |
+| Working capacity | 0.985 | 0.567 mmol g⁻¹ |
+| CO₂/H₂ selectivity | 0.975 (log-space) | 0.101 |
+| Heat of adsorption | 0.817 | 0.552 kJ mol⁻¹ |
 
-- **Precision@10 = 1.00** for CO₂ uptake and working capacity
-- **32 Pareto-optimal** structures identified from 278,885
-- **50 priority synthesis candidates** ranked by unified multi-objective score
-- **fof** and **fsc** topologies identified as high-selectivity families (median selectivity 172 and 145)
-- ~**4 orders of magnitude** faster than exhaustive GCMC simulation
+- **Principal finding:** Packing efficiency (1 − void fraction) governs selectivity, not pore diameter
+- **Top topologies:** *fof* (median selectivity 172.0) and *fsc* (145.5) vs *pcu* (73.6)
+- **Pareto front:** 4 non-dominated structures from 803 high-performance candidates
+- **Priority candidates:** 50 structures; 72% rated High synthesizability, all Tier 1 metals
+- **Uncertainty quantification:** Split conformal prediction → ≥79.8% empirical coverage at 80% nominal on all four targets
 
 ---
 
-## Repository Structure
+## Repository structure
 
 ```
-mof-co2h2-screening/
-├── README.md
-├── LICENSE
-├── requirements.txt
-├── scripts/
-│   ├── 01_build_features.py           # Feature matrix construction
-│   ├── 02_train_models.py             # XGBoost training (all 4 targets)
-│   ├── 02b_improve_selectivity_hoa.py # log1p selectivity retraining
-│   ├── 03_uncertainty.py              # Conformal prediction calibration
-│   ├── 04_shap_analysis.py            # SHAP feature importance
-│   ├── 05_external_validation.py      # CoRE MOF 2019 validation
-│   ├── 06_pareto_analysis.py          # Pareto front + top-k retrieval
-│   ├── 08_supplementary.py            # Supplementary tables + LaTeX
-│   ├── 09_additional_analyses.py      # Additional figures
-│   ├── 10_fix_all_bugs.py             # Bug fixes + corrected figures
-│   ├── 11_improve_hoa.py              # HoA stacking ensemble
-│   └── run_all.py                     # Master pipeline runner
+mof-co2-h2-screening/
+│
 ├── data/
-│   ├── metrics.json                   # Final model performance
-│   ├── train_test_idx.npz             # Fixed train/test split (seed=42)
-│   ├── top_candidates.csv             # Top-50 priority candidates
-│   └── conformal_deltas.json          # Conformal calibration deltas
-└── models/
-    ├── xgb_co2_uptake_mmol_g.json
-    ├── xgb_wc_mmol_g.json
-    ├── xgb_selectivity_co2h2.json
-    ├── xgb_heat_of_ads.json
-    ├── xgb_co2_uptake_mmol_g_q10.json
-    ├── xgb_co2_uptake_mmol_g_q90.json
-    ├── xgb_wc_mmol_g_q10.json
-    ├── xgb_wc_mmol_g_q90.json
-    ├── xgb_selectivity_co2h2_q10.json
-    ├── xgb_selectivity_co2h2_q90.json
-    ├── xgb_heat_of_ads_q10.json
-    └── xgb_heat_of_ads_q90.json
+│   ├── full_features.parquet          # 278,778 × 77: all features + GCMC targets
+│   ├── test_predictions.csv           # 27,878 test-set predictions vs GCMC
+│   ├── shap_values.parquet            # SHAP values for 5,000 test structures
+│   ├── conformal_results.csv          # Conformal calibration coverage results
+│   ├── learning_curves.csv            # Learning curve data (4 targets)
+│   ├── topology_selectivity.csv       # Topology-wise median selectivity + CI
+│   ├── baseline_comparison.csv        # Baseline model R² comparison
+│   ├── topk_metrics.csv               # Precision@k and Recall@k
+│   ├── screening_funnel_counts.csv    # Funnel step counts
+│   └── charge_data.csv                # REPEAT charge coverage and imputation stats
+│
+├── models/
+│   ├── xgb_co2_uptake_mmol_g.json     # Trained XGBoost — CO₂ uptake
+│   ├── xgb_wc_mmol_g.json             # Trained XGBoost — working capacity
+│   ├── xgb_selectivity_co2h2.json     # Trained XGBoost — selectivity (log-space)
+│   └── xgb_heat_of_ads.json           # Stacking ensemble base model — HoA
+│
+├── results/
+│   ├── pareto_front.csv               # 4 Pareto-optimal MOF structures
+│   ├── top_candidates.csv             # Top-50 priority candidates (all metrics)
+│   ├── back_calculated_results.csv    # ML vs GCMC validation (top-50)
+│   ├── synthesizability_results.csv   # SA scores + metal tier classification
+│   ├── weight_sensitivity_results.csv # Jaccard similarity across 50 weight sets
+│   └── robustness_metrics.csv         # Seed stability (seeds 42, 0, 123)
+│
+├── scripts/
+│   ├── 01_feature_engineering.py      # Geometric + RAC + RDF + REPEAT features
+│   ├── 02_data_split.py               # Stratified 90/10 split, seed 42
+│   ├── 03_train_xgboost.py            # Optuna HPO + XGBoost training (4 targets)
+│   ├── 04_stacking_ensemble_hoa.py    # Stacking ensemble for heat of adsorption
+│   ├── 05_conformal_prediction.py     # Split conformal calibration + coverage
+│   ├── 06_shap_analysis.py            # SHAP TreeExplainer + dependence plots
+│   ├── 07_baseline_models.py          # Ridge, RF, MLP, CGCNN baselines
+│   ├── 08_topology_analysis.py        # Topology-wise selectivity + bootstrap CI
+│   ├── 09_screening_funnel.py         # WC + selectivity filters + Pareto front
+│   ├── 10_candidate_validation.py     # GCMC rerun + ML vs GCMC comparison
+│   ├── 11_synthesizability.py         # SA score + metal tier classification
+│   ├── 12_weight_sensitivity.py       # Jaccard stability across weight sets
+│   ├── 13_cross_validation.py         # 3-fold CV + seed stability analysis
+│   └── 14_figures.py                  # All manuscript figures (main + SI)
+│
+├── figures/
+│   ├── main/                          # Figures 01–13 (PNG + PDF)
+│   └── supplementary/                 # Figures S1–S4 (PNG + PDF)
+│
+├── environment.yml                    # Conda environment specification
+├── requirements.txt                   # pip-installable dependencies
+├── LICENSE                            # MIT licence (code)
+├── LICENSE-DATA                       # CC BY 4.0 (data)
+└── README.md                          # This file
 ```
 
 ---
 
-## Installation
+## Quickstart
+
+### 1. Clone the repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/YOUR_USERNAME/mof-co2h2-screening.git
-cd mof-co2h2-screening
+git clone https://github.com/Rifat19R/mof-co2-h2-screening.git
+cd mof-co2-h2-screening
+```
 
-# Create virtual environment
-python -m venv venv
-venv\Scripts\activate        # Windows
-# source venv/bin/activate   # Linux/Mac
+### 2. Set up the environment
 
-# Install dependencies
+Using conda (recommended):
+```bash
+conda env create -f environment.yml
+conda activate mof-screening
+```
+
+Using pip:
+```bash
 pip install -r requirements.txt
+```
+
+### 3. Reproduce the results
+
+Run scripts in numbered order:
+
+```bash
+# Feature engineering
+python scripts/01_feature_engineering.py
+
+# Train models
+python scripts/03_train_xgboost.py
+python scripts/04_stacking_ensemble_hoa.py
+
+# Conformal calibration
+python scripts/05_conformal_prediction.py
+
+# Screening funnel → top-50 candidates
+python scripts/09_screening_funnel.py
+
+# Generate all figures
+python scripts/14_figures.py
+```
+
+Or reproduce the full pipeline end-to-end:
+```bash
+bash run_pipeline.sh
+```
+
+### 4. Load pre-trained models and make predictions
+
+```python
+import xgboost as xgb
+import pandas as pd
+
+# Load a trained model
+model = xgb.XGBRegressor()
+model.load_model('models/xgb_co2_uptake_mmol_g.json')
+
+# Load features for new structures
+features = pd.read_parquet('data/full_features.parquet').drop(
+    columns=['co2_uptake_mmol_g', 'wc_mmol_g', 'selectivity_co2h2', 'heat_of_ads']
+)
+
+# Predict CO₂ uptake for all 278,778 structures
+predictions = model.predict(features)
 ```
 
 ---
 
 ## Data
 
-### Required (not included — too large)
-
-| File | Size | Source |
+| File | Description | Size |
 |---|---|---|
-| `arcmof_co2_features.parquet` | ~80 MB | [ARC-MOF Zenodo](https://doi.org/10.1021/acs.chemmater.2c02485) |
-| `RACs.csv` | ~200 MB | ARC-MOF database |
-| `RDFs.csv` | ~500 MB | ARC-MOF database |
-| `repeat_charge_stats.parquet` | ~5 MB | ARC-MOF database |
-| `full_features.parquet` | ~180 MB | Generated by `01_build_features.py` |
+| `data/full_features.parquet` | 278,778 × 77 feature matrix + 4 GCMC targets | ~180 MB |
+| `data/test_predictions.csv` | 27,878 test-set ML predictions vs GCMC | ~8 MB |
+| `data/shap_values.parquet` | SHAP values for 5,000 test structures | ~12 MB |
+| `results/top_candidates.csv` | Top-50 priority candidates, all metrics | <1 MB |
 
-Download the ARC-MOF database from the original publication:
-> Burner et al., *Chem. Mater.* 2023, 35, 900–916. https://doi.org/10.1021/acs.chemmater.2c02485
-
-### Included in this repository
-
-- `data/train_test_idx.npz` — fixed 90/10 train/test split indices (seed=42)
-- `data/metrics.json` — final model R², MAE, RMSE for all targets
-- `data/top_candidates.csv` — top-50 priority MOF candidates with predicted properties
-- `data/conformal_deltas.json` — conformal prediction calibration deltas
+**ARC-MOF source database:** Raza et al., *Chem. Mater.* 34, 2864–2884 (2022).  
+The raw CIF structures and original GCMC data are available from the ARC-MOF authors.  
+This repository contains derived features and model outputs only.
 
 ---
 
-## Usage
+## Feature description
 
-### Run the full pipeline
+The 77-feature input matrix comprises:
 
-```powershell
-# Run all steps in order
-python run_all.py
+| Feature group | Count | Source |
+|---|---|---|
+| Geometric (Zeo++) | 30 | PLD, LCD, ASA, POAVAg, VF + log-transforms + interaction terms |
+| RAC principal components | 20 | 95.3% variance from 176 revised autocorrelation descriptors |
+| RDF principal components | 20 | 94.3% variance from 678 radial distribution function features |
+| REPEAT charge statistics | 7 | mean, std, skew, kurt, min, max, atom count |
 
-# Resume from a specific step
-python run_all.py --start-from=5
+**REPEAT charge coverage:** 24,483 / 278,778 structures (8.8%). Median imputation applied to the remaining 91.2% (imputed median std = 0.4112 e; real range 0.0000–0.7962 e).
 
-# Run only specific steps
-python run_all.py --only=1,2
+---
 
-# Skip the optional HoA stacking (saves ~2 hours)
-python run_all.py --skip=10
-```
+## Models
 
-### Pipeline steps and estimated runtimes (CPU only)
-
-| Step | Script | Description | Time |
+| Model | Target | Architecture | R² (test) |
 |---|---|---|---|
-| 1 | `01_build_features.py` | Build 77-feature matrix | 5–8 min |
-| 2 | `02_train_models.py` | Train XGBoost (4 targets, Optuna) | 3–4 hrs |
-| 3 | `02b_improve_selectivity_hoa.py` | Retrain selectivity with log1p | 3 hrs |
-| 4 | `03_uncertainty.py` | Conformal prediction calibration | 15 min |
-| 5 | `04_shap_analysis.py` | SHAP feature importance | 15 min |
-| 6 | `05_external_validation.py` | CoRE MOF 2019 validation | 3 min |
-| 7 | `06_pareto_analysis.py` | Pareto front + top-k retrieval | 8 min |
-| 8 | `10_fix_all_bugs.py` | Corrected figures (all targets) | 30 min |
-| 9 | `09_additional_analyses.py` | Additional figures | 30 min |
-| 10 | `11_improve_hoa.py` | HoA stacking ensemble (optional) | 2–3 hrs |
-| 11 | `08_supplementary.py` | Supplementary tables + LaTeX | 3 min |
+| `xgb_co2_uptake_mmol_g.json` | CO₂ uptake | XGBoost (n_est=900, depth=8) | 0.981 |
+| `xgb_wc_mmol_g.json` | Working capacity | XGBoost (n_est=900, depth=8) | 0.985 |
+| `xgb_selectivity_co2h2.json` | Selectivity (log-space) | XGBoost (n_est=900, depth=8) | 0.975 |
+| `xgb_heat_of_ads.json` | Heat of adsorption | Stacking ensemble (XGB+LGBM+RF+ET+Ridge) | 0.817 |
 
-**Total runtime:** ~8–9 hours without step 10; ~10–12 hours with step 10.
-
-### Use pre-trained models directly
-
-```python
-import numpy as np
-import xgboost as xgb
-
-# Load a trained model
-model = xgb.XGBRegressor()
-model.load_model("models/xgb_co2_uptake_mmol_g.json")
-
-# Predict on your feature matrix (must match 77-feature format)
-# See 01_build_features.py for feature construction
-predictions = model.predict(X_your_mofs)
-
-# IMPORTANT: selectivity model was trained on log1p scale
-sel_model = xgb.XGBRegressor()
-sel_model.load_model("models/xgb_selectivity_co2h2.json")
-sel_log = sel_model.predict(X_your_mofs)
-sel_real = np.maximum(np.expm1(sel_log), 0)   # back-transform
-```
-
----
-
-## Feature Space (77 dimensions)
-
-| Block | Dimensions | Method | Variance retained |
-|---|---|---|---|
-| Geometric (zeo++) | 30 | Direct + interaction terms | — |
-| RAC descriptors | 20 PCs | PCA on 176 raw features | 95.3% |
-| RDF descriptors | 20 PCs | PCA on 678 raw features | 94.3% |
-| REPEAT charge stats | 7 | mean, std, skew, kurt, min, max, n | — |
-
-**Note on charge imputation:** REPEAT charges are available for 24,483 structures (8.8%). The remaining 91.2% receive median-imputed charge statistics. This is the primary factor limiting heat of adsorption prediction accuracy.
-
-**Note on selectivity transform:** The selectivity model was retrained using log₁₊₁ transformation of targets (script `02b`). Always apply `np.expm1()` to selectivity predictions before interpreting in physical units.
-
----
-
-## Reproducibility
-
-All results are fully reproducible:
-- Random seed fixed at **42** throughout all scripts
-- Fixed train/test split saved in `data/train_test_idx.npz`
-- Trained model weights saved in `models/` as XGBoost JSON files
-- All figures generated at 300 dpi
-
-To reproduce all figures from trained models without retraining:
-```powershell
-python run_all.py --start-from=4
-```
-
----
-
-## Top-50 Candidate MOFs
-
-The file `data/top_candidates.csv` contains the 50 priority synthesis candidates ranked by unified multi-objective score (arithmetic mean of normalised WC, selectivity, CO₂ uptake, and inverted HoA).
-
-**#1 ranked candidate:** `DB1-Cu2O8-irmof10_A-irmof16_A_No649`
-- Predicted WC: 44.3 mmol/g (>99th percentile)
-- Predicted selectivity: 49.0
-- Predicted HoA: 5.8 kJ/mol
-- Metal node: Cu-paddlewheel (IRMOF family)
+Hyperparameters optimised by Optuna Bayesian search (200 trials, 5-fold CV).
 
 ---
 
 ## Citation
 
-If you use this code or data in your research, please cite:
+If you use this code, data, or models, please cite:
 
 ```bibtex
 @article{khandaker2025mof,
-  title={Machine Learning-Accelerated Screening of Metal-Organic Frameworks 
-         for Pre-combustion CO$_2$/H$_2$ Separation: Multi-target Prediction, 
-         Uncertainty Quantification, and Pareto-Optimal Candidate Identification},
-  author={Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Hossain, Sujan},
-  journal={npj Computational Materials},
-  year={2025},
-  publisher={Nature Publishing Group}
-}
-```
-
-Please also cite the ARC-MOF database:
-```bibtex
-@article{burner2023arcmof,
-  title={ARC-MOF: A Diverse Database of Metal-Organic Frameworks with 
-         DFT-Derived Partial Atomic Charges and Descriptors for Machine Learning},
-  author={Burner, Jake and Luo, Jun and White, Andrew and others},
-  journal={Chemistry of Materials},
-  volume={35},
-  pages={900--916},
-  year={2023},
-  doi={10.1021/acs.chemmater.2c02485}
+  title   = {Packing Efficiency Governs CO$_2$/H$_2$ Selectivity in Metal--Organic
+             Frameworks: Uncertainty-Guided Machine Learning Screening of
+             278,778 Structures Reveals Topology-Level Reticular Design Rules},
+  author  = {Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Hossain, Sujan},
+  journal = {Communications Chemistry},
+  year    = {2025},
+  note    = {Under review},
+  doi     = {10.5281/zenodo.XXXXXXX}
 }
 ```
 
 ---
 
-## License
+## Dependencies
 
-- **Code:** MIT License — see [LICENSE](LICENSE)
-- **Model weights:** CC BY 4.0
-- **Data (top_candidates.csv, metrics.json):** CC BY 4.0
+Core:
+- Python ≥ 3.9
+- xgboost ≥ 1.7
+- lightgbm ≥ 3.3
+- scikit-learn ≥ 1.2
+- pandas ≥ 1.5
+- numpy ≥ 1.23
+- shap ≥ 0.41
+- optuna ≥ 3.0
+- pymatgen ≥ 2023.1
+- rdkit ≥ 2022.09
+
+Visualisation:
+- matplotlib ≥ 3.6
+- seaborn ≥ 0.12
+
+See `environment.yml` for the full pinned environment used to produce manuscript figures.
+
+---
+
+## Licence
+
+**Code:** MIT — see [LICENSE](LICENSE)  
+**Data and figures:** CC BY 4.0 — see [LICENSE-DATA](LICENSE-DATA)
 
 ---
 
 ## Contact
 
-**Md. Rifat Khandaker**
-Department of Chemical Engineering
-Dhaka University of Engineering and Technology (DUET), Bangladesh
-Email: rifatkh.duet@gmail.com
+Md. Rifat Khandaker — rifatkh.duet@gmail.com  
+Google Scholar: [scholar.google.com/citations?user=dp3Vs-QAAAAJ](https://scholar.google.com/citations?user=dp3Vs-QAAAAJ)  
+LinkedIn: [linkedin.com/in/quantum-boy](https://linkedin.com/in/quantum-boy/)
