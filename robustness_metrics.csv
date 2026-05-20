@@ -1,0 +1,13 @@
+split_type,fold_or_seed,target,R2,MAE
+3-fold CV (n_est=300),fold_1,CO2_uptake,0.976647,0.633865
+3-fold CV (n_est=300),fold_2,CO2_uptake,0.976654,0.633718
+3-fold CV (n_est=300),fold_3,CO2_uptake,0.976944,0.632096
+3-fold CV (n_est=300),fold_1,WC,0.981197,0.636033
+3-fold CV (n_est=300),fold_2,WC,0.981343,0.63637
+3-fold CV (n_est=300),fold_3,WC,0.981401,0.636255
+3-fold CV (n_est=300),fold_1,Selectivity,0.969973,0.110867
+3-fold CV (n_est=300),fold_2,Selectivity,0.970186,0.111263
+3-fold CV (n_est=300),fold_3,Selectivity,0.969608,0.11121
+3-fold CV (n_est=300),fold_1,HoA,0.814982,0.553739
+3-fold CV (n_est=300),fold_2,HoA,0.818616,0.549184
+3-fold CV (n_est=300),fold_3,HoA,0.815956,0.552041
