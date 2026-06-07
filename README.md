@@ -1,185 +1,333 @@
-Packing efficiency governs CO₂/H₂ selectivity in machine-learning-screened MOFs
-This repository contains the analysis code for the manuscript:
+# Packing Efficiency Governs CO₂/H₂ Selectivity in Machine-Learning-Screened MOFs
+
+This repository contains the analysis code and reproducibility archive links for the manuscript:
+
 Packing Efficiency Governs CO₂/H₂ Selectivity in Metal–Organic Frameworks: Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals Topology-Level Reticular Design Rules
-Authors: Md. Rifat Khandaker, Mohammad Asaduzzaman Chowdhury, Sujan Hossain  
-Affiliation: Department of Chemical Engineering, Dhaka University of Engineering & Technology (DUET), Gazipur-1700, Bangladesh  
-Contact: rifatkh.duet@gmail.com
+
+Authors: Md. Rifat Khandaker, Mohammad Asaduzzaman Chowdhury, Sujan Hossain
+
+Affiliation: Department of Chemical Engineering, Dhaka University of Engineering & Technology (DUET), Gazipur-1700, Bangladesh
+
+Corresponding author: rifatkh.duet@gmail.com
+
+Target journal: *Digital Discovery*, Royal Society of Chemistry
+
+Data archive: https://doi.org/10.5281/zenodo.20305725
+
 ---
+
 What this project does
-This project uses an uncertainty-guided machine-learning workflow to screen 278,778 ARC-MOF structures for pre-combustion CO₂/H₂ separation at 298 K and 40 bar. The goal is not only to rank materials. The goal is to extract design rules that are useful for reticular MOF design.
-The workflow predicts four adsorption targets:
-CO₂ uptake
-CO₂ working capacity
-CO₂/H₂ selectivity
-Heat of adsorption
-The final model stack combines descriptor-based learning, split conformal uncertainty quantification, SHAP interpretation, topology-level analysis, Pareto screening, synthesizability scoring, and weight-sensitivity testing.
+
+This project uses an uncertainty-guided machine-learning workflow to screen 278,778 ARC-MOF structures for pre-combustion CO₂/H₂ separation at 298 K and 40 bar. The goal is not only to rank materials. The goal is to extract design rules that are useful for reticular MOF synthesis and experimental follow-up.
+
+The workflow predicts four adsorption targets simultaneously:
+
+- CO₂ uptake
+- CO₂ working capacity
+- CO₂/H₂ selectivity
+- Heat of adsorption
+
+The final model stack combines descriptor-based learning, split conformal uncertainty quantification, SHAP interpretation, topology-level analysis, Pareto screening, synthesizability scoring, and weight-sensitivity testing. Every screened candidate carries a calibrated uncertainty interval alongside its point prediction, so candidate selection can account for both performance and prediction risk.
+
 ---
+
 Main result
-The central finding is simple:
-> **CO₂/H₂ selectivity is governed more strongly by packing efficiency than by pore diameter.**
-Working capacity follows a different rule. It peaks near POAVAg ≈ 1.5 cm³ g⁻¹ and weakens beyond roughly 2 cm³ g⁻¹. This gives a practical design window:
-> **POAVAg = 1–2 cm³ g⁻¹ with crystal density below 0.5 g cm⁻³.**
-At topology level, fof and fsc nets show strong median CO₂/H₂ selectivity, with median selectivities of 172.0 and 145.5, compared with a database median of 89.
+
+The central finding is straightforward:
+
+> CO₂/H₂ selectivity is governed more strongly by packing efficiency than by pore diameter.
+
+Working capacity follows a different rule. It peaks near POAVAg ≈ 1.5 cm³ g⁻¹ and weakens beyond roughly 2 cm³ g⁻¹. This gives a practical synthesis design window:
+
+> POAVAg = 1–2 cm³ g⁻¹ with crystal density below 0.5 g cm⁻³.
+
+At topology level, fof and fsc nets show consistently high median CO₂/H₂ selectivities of 172.0 and 145.5, respectively, compared with a database-wide median of 89. This is, to our knowledge, the first topology–selectivity map reported at full ARC-MOF database resolution.
+
 ---
+
 Dataset and descriptors
-The workflow starts from the ARC-MOF database and retains 278,778 structures after removing entries with missing or non-finite target values.
+
+The workflow starts from the ARC-MOF database (Rosen et al., *Digital Discovery*, 2023) and retains 278,778 structures after removing entries with missing or non-finite target values (107 entries discarded).
+
 The final descriptor matrix contains 77 features:
-Descriptor family	Count	Description
-Geometric descriptors	30	Pore volume, surface area, void fraction, density, sphere diameters, interaction terms, log-transforms
-RAC principal components	20	PCA-reduced revised autocorrelation descriptors
-RDF principal components	20	PCA-reduced radial distribution function descriptors
-REPEAT charge statistics	7	Mean, standard deviation, skewness, kurtosis, min, max, atom count
-REPEAT partial charges are available for only 8.8% of the database. The remaining structures use median-imputed charge statistics. This is the main limitation for heat-of-adsorption prediction.
+
+| Descriptor family | Dimensions | Description |
+|---|---|---|
+| Geometric descriptors | 30 | Pore volume, surface area, void fraction, density, sphere diameters, interaction terms, log-transforms |
+| RAC principal components | 20 | PCA on 176 raw revised autocorrelation features (95.3% variance retained) |
+| RDF principal components | 20 | PCA on 678 raw radial distribution function features (94.3% variance retained) |
+| REPEAT charge statistics | 7 | Mean, standard deviation, skewness, kurtosis, min, max, atom count |
+
+REPEAT partial charges are available for only 24,483 structures (8.8% of the database). The remaining 91.2% use column-wise median imputation. This is the primary limitation for heat-of-adsorption prediction and is treated explicitly as such throughout the manuscript.
+
 ---
+
 Model performance
-Held-out test set: 27,878 structures.
-Target	Model	R²	MAE
-CO₂ uptake	XGBoost	0.981	0.564 mmol g⁻¹
-Working capacity	XGBoost	0.985	0.567 mmol g⁻¹
-CO₂/H₂ selectivity	XGBoost, log(1+x) target	0.975	0.101 log units
-Heat of adsorption	Stacking ensemble	0.817	0.552 kJ mol⁻¹
-The heat-of-adsorption model reaches a descriptor-level ceiling because charge coverage is sparse. This is treated as a limitation, not hidden as model success.
+
+Held-out test set: 27,878 structures (10% of the database, stratified by CO₂ uptake decile, never used during training, hyperparameter search, or conformal calibration).
+
+| Target | Model | R² | MAE |
+|---|---|---|---|
+| CO₂ uptake | XGBoost | 0.981 | 0.564 mmol g⁻¹ |
+| Working capacity | XGBoost | 0.985 | 0.567 mmol g⁻¹ |
+| CO₂/H₂ selectivity | XGBoost, log(1+x) target | 0.975 (log-space) | 0.101 log units |
+| Heat of adsorption | Stacking ensemble | 0.817 | 0.552 kJ mol⁻¹ |
+
+Three-fold cross-validation confirms stability: R² = 0.977 ± 0.000 (CO₂ uptake), 0.981 ± 0.000 (working capacity), 0.970 ± 0.000 (selectivity), 0.817 ± 0.002 (HoA). Seed-stability analysis across seeds 42, 0, and 123 gives R² variation below 0.002 for the three primary targets.
+
+The heat-of-adsorption model reaches a descriptor-level ceiling because charge coverage is sparse. This is stated clearly as a limitation, not hidden as model success.
+
 ---
+
+Uncertainty quantification
+
+Split conformal prediction provides finite-sample calibrated intervals for all four targets. Before correction, uncalibrated quantile models covered only ~0.75 of test values at 80% nominal level. After conformal calibration on ~25,090 held-out structures, empirical coverages on the test set are:
+
+| Target | Empirical coverage at 80% nominal | Interval width |
+|---|---|---|
+| CO₂ uptake | 0.803 | 2.30 mmol g⁻¹ |
+| Working capacity | 0.798 | 2.33 mmol g⁻¹ |
+| CO₂/H₂ selectivity | 0.800 | 33.6 raw units |
+| Heat of adsorption | 0.799 | 1.68 kJ mol⁻¹ |
+
+---
+
 Screening output
+
 The candidate-selection workflow is filter-first, then Pareto-ranked.
-Stage	Criterion	Structures retained
-Full retained ARC-MOF set	Valid target values	278,778
-Working-capacity filter	WC ≥ 19.57 mmol g⁻¹	69,685
-Selectivity filter	CO₂/H₂ selectivity ≥ 130	803
-Restricted Pareto front	WC vs selectivity inside the 803-structure pool	4
-Final priority set	Four-target scalarisation	50
-The final priority set contains 50 MOFs. Of these, 72% are assigned High synthesizability based on family-level structural precedent and metal-node criteria.
+
+| Stage | Criterion | Structures retained |
+|---|---|---|
+| Full retained ARC-MOF set | Valid target values | 278,778 |
+| Working-capacity filter | WC ≥ 19.57 mmol g⁻¹ (75th percentile) | 69,685 |
+| Selectivity filter | CO₂/H₂ selectivity ≥ 130 | 803 |
+| Restricted Pareto front | WC vs. selectivity inside the 803-structure pool | 4 |
+| Final priority set | Four-target scalarisation | 50 |
+
+The final priority set contains 50 MOFs. Of these, 72% are assigned High synthesizability based on structural family precedent (IRMOF, MOF-177, PCN series) and Tier 1 or Tier 2 metal-node criteria.
+
+Top-ranked candidate: `DB1-Zn2O8N2-ADC_Airmof14_A_No822`
+
+- GCMC working capacity: 32.674 mmol g⁻¹ | ML predicted: 31.826 mmol g⁻¹
+- GCMC selectivity: 151.5 | ML predicted: 152.1
+- GCMC CO₂ uptake: 37.789 mmol g⁻¹
+- ML heat of adsorption: 6.867 kJ mol⁻¹
+- Synthesizability: High (IRMOF family, Zn node)
+
 ---
+
+Topology–selectivity results
+
+| Topology | Structures (n) | Median CO₂/H₂ selectivity | 95% bootstrap CI |
+|---|---|---|---|
+| fof | 689 | 172.0 | 168.9–175.7 |
+| fsc | 45,297 | 145.5 | 145.1–145.9 |
+| clean | — | 139.8 | 137.0–142.2 |
+| pcu | 62,359 | 73.6 | — |
+| Database-wide median | 278,778 | 89.0 | — |
+
+Bootstrap CIs from 1,000 resamples at seed 42. fof and fsc are the primary reticular design targets identified by this study.
+
+---
+
 Repository structure
-Recommended layout:
+
 ```text
 .
 ├── data/
-│   ├── raw/                    # Raw ARC-MOF inputs, if locally available
+│   ├── raw/                    # Raw ARC-MOF inputs (not included; obtain from source)
 │   ├── processed/              # Processed descriptor matrices and target files
-│   ├── splits/                 # Fixed train/test/calibration split indices
-│   └── candidates/             # Final screened and prioritized MOF lists
-├── models/                     # Trained model files
+│   ├── splits/                 # Fixed train/test/calibration split indices (seed 42)
+│   └── candidates/             # Final screened and prioritised MOF lists
+├── models/                     # Trained XGBoost and stacking ensemble model files
 ├── outputs/
-│   ├── metrics/                # Test, CV, seed-stability, and candidate-set metrics
-│   ├── conformal/              # Split conformal interval outputs
-│   ├── shap/                   # SHAP values and feature rankings
+│   ├── metrics/                # Test-set, CV, seed-stability, and candidate-set metrics
+│   ├── conformal/              # Split conformal calibration and interval outputs
+│   ├── shap/                   # SHAP values and feature importance rankings
 │   ├── screening/              # Pareto, scalarisation, and weight-sensitivity outputs
-│   └── figures/                # Final manuscript figures
-├── scripts/                    # Reproducible analysis scripts
-├── notebooks/                  # Optional exploratory notebooks
-├── requirements.txt            # Python package requirements
-├── environment.yml             # Optional conda environment file
+│   └── figures/                # Final manuscript figures (300 dpi)
+├── scripts/                    # Reproducible numbered analysis scripts
+├── requirements.txt            # Python package requirements (pinned versions)
 └── README.md
 ```
-The exact processed data, trained models, fixed split indices, computed outputs, and candidate lists are archived on Zenodo:
-DOI: `10.5281/zenodo.20305725`  
-URL: `https://doi.org/10.5281/zenodo.20305725`
+
+The processed feature matrix, trained models, fixed split indices, computed outputs, and candidate lists are all archived on Zenodo:
+
+DOI: `10.5281/zenodo.20305725`
+URL: https://doi.org/10.5281/zenodo.20305725
+
 ---
+
 Installation
+
 Clone the repository:
+
 ```bash
 git clone https://github.com/Rifat19R/mof-co2-h2-screening.git
 cd mof-co2-h2-screening
 ```
+
 Create a clean Python environment:
+
 ```bash
 python -m venv .venv
-source .venv/bin/activate      # Linux/macOS
-# .venv\Scripts\activate       # Windows PowerShell
+source .venv/bin/activate       # Linux/macOS
+# .venv\Scripts\activate        # Windows PowerShell
 ```
+
 Install dependencies:
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
-Core packages used in the study:
-Python 3.13
-XGBoost 2.x
-LightGBM 4.x
-scikit-learn 1.x
-Optuna 3.x
-SHAP
-NumPy
-Pandas
-Matplotlib
-SciPy
+
+Core packages used in this study: Python 3.13, XGBoost 2.x, LightGBM 4.x, scikit-learn 1.x, Optuna 3.x, SHAP, NumPy, Pandas, Matplotlib, SciPy.
+
 ---
+
 Reproducing the workflow
+
 The full workflow follows this order:
+
 ```text
-1. Prepare target table and descriptor matrix
-2. Build fixed train/test/calibration splits
-3. Train XGBoost models for CO₂ uptake, working capacity, and selectivity
-4. Train stacking ensemble for heat of adsorption
-5. Run cross-validation and seed-stability checks
-6. Build split conformal prediction intervals
-7. Compute SHAP values and dependence plots
-8. Run high-performance filtering
-9. Compute restricted Pareto front
-10. Run four-target scalarisation
-11. Run synthesizability scoring and weight-sensitivity analysis
+1.  Prepare target table and 77-dimensional descriptor matrix
+2.  Build fixed stratified train/test/calibration splits (seed 42)
+3.  Train XGBoost models for CO₂ uptake, working capacity, and selectivity
+4.  Train stacking ensemble for heat of adsorption (XGB + LightGBM + RF + ET + Ridge)
+5.  Run three-fold cross-validation and seed-stability checks
+6.  Build split conformal prediction intervals (calibration on ~25,090 structures)
+7.  Compute SHAP values and dependence plots (5,000 test structures)
+8.  Run high-performance filtering (WC and selectivity thresholds)
+9.  Compute restricted Pareto front inside the 803-structure filtered pool
+10. Run four-target scalarisation to select top-50 priority candidates
+11. Run synthesizability scoring and weight-sensitivity analysis (50 weight sets)
 12. Generate final figures and tables
 ```
+
 Suggested command pattern:
+
 ```bash
-python scripts/01_prepare_features.py
+python scripts/01_build_features.py
 python scripts/02_train_models.py
-python scripts/03_cross_validation.py
-python scripts/04_conformal_prediction.py
-python scripts/05_shap_analysis.py
-python scripts/06_screen_candidates.py
-python scripts/07_weight_sensitivity.py
-python scripts/08_make_figures.py
+python scripts/02b_improve_selectivity_hoa.py
+python scripts/03_uncertainty.py
+python scripts/04_shap_analysis.py
+python scripts/05_external_validation.py
+python scripts/06_pareto_analysis.py
+python scripts/09_additional_analyses.py
+python scripts/10_fix_all_bugs.py
+python scripts/11_improve_hoa.py
+python scripts/08_supplementary.py
 ```
-If your local script names differ, keep the same order. The important part is the fixed split indices and the archived processed inputs.
+
+To reproduce all figures from the pre-trained models without retraining (~45 minutes total):
+
+```bash
+python scripts/04_shap_analysis.py
+python scripts/05_external_validation.py
+python scripts/06_pareto_analysis.py
+python scripts/09_additional_analyses.py
+python scripts/08_supplementary.py
+```
+
 ---
+
 Data availability
-The reproducibility archive contains:
-Processed feature matrix
-Fixed train/test split indices
-Calibration indices for conformal prediction
-Trained model files
-Computed model metrics
-Conformal prediction outputs
-SHAP outputs
-Pareto-screening results
-Weight-sensitivity outputs
-Final prioritized candidate list
-The raw ARC-MOF adsorption data should be obtained from the original ARC-MOF database source. This repository is intended to reproduce the analysis from the processed and archived inputs.
+
+The reproducibility archive on Zenodo contains:
+
+- Processed 77-dimensional feature matrix (full_features.parquet, 178,778 structures)
+- Fixed train/test split indices (seed 42, stratified by CO₂ uptake decile)
+- Calibration indices for conformal prediction
+- Trained XGBoost model files (primary + quantile models for all four targets)
+- Stacking ensemble weights for heat of adsorption
+- Computed model metrics (test-set, cross-validation, seed-stability)
+- Conformal prediction calibration outputs and interval widths
+- SHAP outputs and feature importance rankings
+- Pareto-screening results and scalarisation scores
+- Weight-sensitivity outputs (50 weight sets)
+- Final prioritised top-50 candidate list with GCMC and ML values
+
+The raw ARC-MOF adsorption data should be obtained directly from the original source:
+
+> Rosen, A. S. et al. ARC-MOF: a diverse database of metal-organic frameworks with DFT-quality electronic structure data and GCMC-computed gas adsorption isotherms. *Digital Discovery* 2, 1303–1315 (2023). https://doi.org/10.1039/D3DD00158J
+
 ---
+
 Important scope limits
-This work is a GCMC-benchmarked comparative screen, not an experimental validation study.
-Key limits:
-The screen is fixed at 298 K.
-Industrial pre-combustion streams often operate at higher temperature.
-Absolute capacities should not be treated as process-level values without temperature-dependent isotherms.
-Heat-of-adsorption prediction is limited by sparse REPEAT charge coverage.
-Synthesizability scores indicate family-level precedent. They do not prove that a specific hypothetical structure has already been synthesized.
-These limits are part of the workflow. They define the next step: targeted experimental or higher-fidelity computational validation of the shortlisted MOFs.
+
+This work is a GCMC-benchmarked comparative screen at 298 K, not an experimental validation study.
+
+The screen is fixed at 298 K and 40 bar. Industrial pre-combustion streams operate at 150–400°C. Absolute capacities reported here are upper-bound comparative estimates and must be temperature-corrected before any process-level interpretation. Relative rankings are expected to remain qualitatively stable across moderate temperature changes.
+
+Heat-of-adsorption prediction is limited by sparse REPEAT charge coverage (8.8% of the database). The model reaches a descriptor-level ceiling at R² ≈ 0.82 regardless of training set size. Full DDEC6 or MEPO-ML charge assignment is the highest-priority next step.
+
+Synthesizability scores indicate structural family precedent and established secondary building units. They do not prove that any specific hypothetical structure has already been synthesised or will be straightforward to realise experimentally. Experimental validation remains essential for the shortlisted candidates.
+
 ---
+
 Citation
-Manuscript citation will be updated after publication.
-For now, cite the repository and Zenodo archive:
+
+If this code or data contributes to your work, please cite the manuscript, the Zenodo archive, and the ARC-MOF database.
+
+Manuscript (update after publication):
+
 ```bibtex
-@misc{khandaker_mof_co2_h2_screening,
-  title  = {Packing efficiency governs CO2/H2 selectivity in machine-learning-screened metal-organic frameworks},
+@article{khandaker2025mof,
+  title   = {Packing Efficiency Governs {CO$_2$/H$_2$} Selectivity in Metal--Organic Frameworks:
+             Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals
+             Topology-Level Reticular Design Rules},
+  author  = {Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Hossain, Sujan},
+  journal = {Digital Discovery},
+  year    = {2025},
+  publisher = {Royal Society of Chemistry}
+}
+```
+
+Zenodo data archive:
+
+```bibtex
+@misc{khandaker2026zenodo,
+  title  = {Data and trained models for ``Packing Efficiency Governs {CO$_2$/H$_2$} Selectivity in {MOFs}"},
   author = {Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Hossain, Sujan},
   year   = {2026},
   doi    = {10.5281/zenodo.20305725},
   url    = {https://doi.org/10.5281/zenodo.20305725}
 }
 ```
+
+ARC-MOF database:
+
+```bibtex
+@article{rosen2023arcmof,
+  title   = {{ARC-MOF}: a diverse database of metal-organic frameworks with {DFT}-quality
+             electronic structure data and {GCMC}-computed gas adsorption isotherms},
+  author  = {Rosen, Andrew S. and others},
+  journal = {Digital Discovery},
+  volume  = {2},
+  pages   = {1303--1315},
+  year    = {2023},
+  doi     = {10.1039/D3DD00158J}
+}
+```
+
 ---
+
 License
-Add the repository license before publication. Recommended:
-MIT License for code
-CC BY 4.0 for processed data, figures, and documentation, if compatible with the original data-source terms
-Do not redistribute raw ARC-MOF files unless the original license permits it.
+
+- Code: MIT License — see [LICENSE](LICENSE)
+- Trained model weights and processed data outputs: CC BY 4.0
+
+Do not redistribute raw ARC-MOF files unless the original database licence permits it. Check the ARC-MOF source before redistribution.
+
 ---
+
 Contact
-Md. Rifat Khandaker  
-Department of Chemical Engineering  
-Dhaka University of Engineering & Technology (DUET)  
-Gazipur-1700, Bangladesh  
+
+Md. Rifat Khandaker
+Department of Chemical Engineering
+Dhaka University of Engineering & Technology (DUET)
+Gazipur-1700, Bangladesh
 Email: rifatkh.duet@gmail.com
+GitHub: https://github.com/Rifat19R
