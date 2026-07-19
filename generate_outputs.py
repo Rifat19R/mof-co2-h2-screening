@@ -807,7 +807,7 @@ else:
 hdr("STEP 17 — 3-fold CV robustness -> robustness_metrics.csv")
 
 print("  3-fold stratified CV (n_estimators=300, conservative lower bound)")
-print("  For 5-fold results run: robustness_metrics.py --data data/full_features.parquet")
+print("  For seed-stability results (Table S2) run: robustness_metrics.py --data data/full_features.parquet")
 
 skf_rb  = StratifiedKFold(n_splits=3, shuffle=True, random_state=SEED)
 rb_rows = []
