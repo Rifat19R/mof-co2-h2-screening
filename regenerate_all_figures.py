@@ -3,7 +3,7 @@ regenerate_all_figures.py
 =========================
 Master figure generation script for:
   "Packing Efficiency Governs CO2/H2 Selectivity in MOFs"
-Target journal: Communications Chemistry (Nature Portfolio)
+Target journal: Digital Discovery (Royal Society of Chemistry)
 
 Run from your scripts folder:
     python regenerate_all_figures.py
@@ -33,8 +33,8 @@ warnings.filterwarnings("ignore")
 # PATHS
 # =============================================================================
 
-DATA_DIR  = Path(r"D:\Rifat\MOF_Screening\data")
-SCRPT_DIR = Path(r"D:\Rifat\MOF_Screening\scripts")
+DATA_DIR  = Path(r"D:\Rifat\Research\MOF_Screening\data")
+SCRPT_DIR = Path(r"D:\Rifat\Research\MOF_Screening\scripts")
 OUT_MAIN  = SCRPT_DIR / "figures_main"
 OUT_SUPP  = SCRPT_DIR / "figures_supp"
 
@@ -986,7 +986,7 @@ def figS4_hoa_sources():
 def main():
     print("=" * 65)
     print("MOF ML Manuscript -- Figure Regeneration")
-    print("Target: Communications Chemistry (Nature Portfolio)")
+    print("Target: Digital Discovery (Royal Society of Chemistry)")
     print("=" * 65)
     print(f"\nData dir   : {DATA_DIR}")
     print(f"Script dir : {SCRPT_DIR}")
@@ -1035,7 +1035,7 @@ def main():
     print(f"\nNext steps:")
     print(f"  1. Insert figures_main/ -> Figures 1-13 in manuscript")
     print(f"  2. Insert figures_supp/ -> Supplementary Figures S1-S4")
-    print(f"  3. Submit to Communications Chemistry")
+    print(f"  3. Submit to Digital Discovery")
 
 
 if __name__ == "__main__":

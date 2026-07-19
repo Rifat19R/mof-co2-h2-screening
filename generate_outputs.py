@@ -50,7 +50,7 @@ warnings.filterwarnings("ignore")
 # PATHS
 # =============================================================================
 
-ROOT   = Path(r"D:\Rifat\MOF_Screening")
+ROOT   = Path(r"D:\Rifat\Research\MOF_Screening")
 DATA   = ROOT / "data"
 SCRPT  = ROOT / "scripts"
 MODELS = DATA / "models"
