@@ -47,7 +47,7 @@ At topology level, fof and fsc nets show consistently high median CO₂/H₂ sel
 
 Dataset and descriptors
 
-The workflow starts from the ARC-MOF database (Rosen et al., *Digital Discovery*, 2023) and retains 278,778 structures after removing entries with missing or non-finite target values (107 entries discarded).
+The workflow starts from the ARC-MOF database (Rosen et al., *Digital Discovery*, 2023), which reports 279,384 structures. Of these, 499 failed geometric/RAC/RDF feature computation and were dropped before assembly, and a further 107 had missing or non-finite target values and were dropped after assembly, for 606 discarded in total, leaving 278,778 retained structures.
 
 The final descriptor matrix contains 77 features:
 
@@ -106,7 +106,7 @@ The candidate-selection workflow is filter-first, then Pareto-ranked.
 
 The final priority set contains 50 MOFs. Of these, 72% are assigned High synthesizability based on structural family precedent (IRMOF, MOF-177, PCN series) and Tier 1 or Tier 2 metal-node criteria.
 
-Top-ranked candidate: `DB1-Zn2O8N2-ADC_Airmof14_A_No822`
+Top-ranked candidate: `DB1-Zn2O8N2-ADC_A-irmof14_A_No822`
 
 - GCMC working capacity: 32.674 mmol g⁻¹ | ML predicted: 31.826 mmol g⁻¹
 - GCMC selectivity: 151.5 | ML predicted: 152.1
@@ -134,22 +134,19 @@ Repository structure
 
 ```text
 .
-├── data/
-│   ├── raw/                    # Raw ARC-MOF inputs (not included; obtain from source)
-│   ├── processed/              # Processed descriptor matrices and target files
-│   ├── splits/                 # Fixed train/test/calibration split indices (seed 42)
-│   └── candidates/             # Final screened and prioritised MOF lists
-├── models/                     # Trained XGBoost and stacking ensemble model files
-├── outputs/
-│   ├── metrics/                # Test-set, CV, seed-stability, and candidate-set metrics
-│   ├── conformal/              # Split conformal calibration and interval outputs
-│   ├── shap/                   # SHAP values and feature importance rankings
-│   ├── screening/              # Pareto, scalarisation, and weight-sensitivity outputs
-│   └── figures/                # Final manuscript figures (300 dpi)
-├── scripts/                    # Reproducible numbered analysis scripts
-├── requirements.txt            # Python package requirements (pinned versions)
+├── generate_outputs.py         # Full pipeline: features -> models -> metrics -> screening (17 steps, see docstring)
+├── regenerate_all_figures.py   # Rebuilds all manuscript figures from generate_outputs.py's CSV/parquet outputs
+├── robustness_metrics.py       # Standalone 3-fold CV robustness check
+├── FEATURE_ENGINEERING.md      # How the 77-feature matrix was built from raw ARC-MOF structures
+├── top_candidates.csv, pareto_front.csv, back_calculated_results.csv,
+│   synthesizability_results.csv, weight_sensitivity_results.csv,
+│   robustness_metrics.csv, robustness_tables.txt   # Pipeline outputs, committed for inspection
+├── requirements.txt            # Python package requirements
+├── environment.yml             # Optional conda environment
 └── README.md
 ```
+
+`generate_outputs.py` expects `data/full_features.parquet` (archived on Zenodo, not in this repo) and writes cached model files to `data/models/`. It is idempotent: cached models and existing output files are skipped and reused on re-run.
 
 The processed feature matrix, trained models, fixed split indices, computed outputs, and candidate lists are all archived on Zenodo:
 
@@ -188,48 +185,16 @@ Core packages used in this study: Python 3.13, XGBoost 2.x, LightGBM 4.x, scikit
 
 Reproducing the workflow
 
-The full workflow follows this order:
+`generate_outputs.py` runs the full workflow as 17 sequential steps (see the script's own docstring for the exact list): load features, split train/test, train/load the four XGBoost models, write test predictions, compute SHAP values, build conformal intervals, compute the Pareto front and top candidates, run synthesizability scoring, weight-sensitivity analysis, topology analysis, baseline comparison, and robustness metrics.
 
-```text
-1.  Prepare target table and 77-dimensional descriptor matrix
-2.  Build fixed stratified train/test/calibration splits (seed 42)
-3.  Train XGBoost models for CO₂ uptake, working capacity, and selectivity
-4.  Train stacking ensemble for heat of adsorption (XGB + LightGBM + RF + ET + Ridge)
-5.  Run three-fold cross-validation and seed-stability checks
-6.  Build split conformal prediction intervals (calibration on ~25,090 structures)
-7.  Compute SHAP values and dependence plots (5,000 test structures)
-8.  Run high-performance filtering (WC and selectivity thresholds)
-9.  Compute restricted Pareto front inside the 803-structure filtered pool
-10. Run four-target scalarisation to select top-50 priority candidates
-11. Run synthesizability scoring and weight-sensitivity analysis (50 weight sets)
-12. Generate final figures and tables
-```
-
-Suggested command pattern:
+Command pattern:
 
 ```bash
-python scripts/01_build_features.py
-python scripts/02_train_models.py
-python scripts/02b_improve_selectivity_hoa.py
-python scripts/03_uncertainty.py
-python scripts/04_shap_analysis.py
-python scripts/05_external_validation.py
-python scripts/06_pareto_analysis.py
-python scripts/09_additional_analyses.py
-python scripts/10_fix_all_bugs.py
-python scripts/11_improve_hoa.py
-python scripts/08_supplementary.py
+python generate_outputs.py            # runs all 17 steps; trained models are cached under data/models/
+python regenerate_all_figures.py      # rebuilds all manuscript figures from the CSV/parquet outputs above
 ```
 
-To reproduce all figures from the pre-trained models without retraining (~45 minutes total):
-
-```bash
-python scripts/04_shap_analysis.py
-python scripts/05_external_validation.py
-python scripts/06_pareto_analysis.py
-python scripts/09_additional_analyses.py
-python scripts/08_supplementary.py
-```
+Both scripts are idempotent: cached models and existing output files are skipped and reused on re-run, so re-running `generate_outputs.py` after fetching pre-trained models from Zenodo only regenerates missing outputs, not a full retrain.
 
 ---
 
@@ -237,7 +202,7 @@ Data availability
 
 The reproducibility archive on Zenodo contains:
 
-- Processed 77-dimensional feature matrix (full_features.parquet, 178,778 structures)
+- Processed 77-dimensional feature matrix (full_features.parquet, 278,885 structures; 278,778 after the 107 rows with missing/non-finite targets are dropped at pipeline runtime)
 - Fixed train/test split indices (seed 42, stratified by CO₂ uptake decile)
 - Calibration indices for conformal prediction
 - Trained XGBoost model files (primary + quantile models for all four targets)
