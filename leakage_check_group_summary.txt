@@ -1,0 +1,21 @@
+Rows: 278,778
+Decodable (grouped) rows: 248,551 (89.2%)
+Total groups: 30,230
+Largest group size: 203,022
+Groups with size > 1: 3
+
+Prefix counts (all sources):
+  DB0: 203,022
+  DB1: 23,248
+  DB5: 22,281
+  DB6: 9,090
+  DB12: 7,108
+  DB7: 6,851
+  DB13: 5,164
+  DB15: 1,765
+  DB3: 118
+  DB14: 72
+  DB2: 24
+  DB4: 20
+  DB8: 8
+  DB10: 7

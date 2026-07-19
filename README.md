@@ -77,6 +77,8 @@ Three-fold cross-validation confirms stability: R² = 0.977 ± 0.000 (CO₂ upta
 
 The heat-of-adsorption model reaches a descriptor-level ceiling because charge coverage is sparse. This is stated clearly as a limitation, not hidden as model success.
 
+Two additional robustness checks (`12_feature_ablation.py`, `13_buildingblock_leakage_check.py`) are included in this repository. The feature-set ablation (`feature_ablation_results.csv`) shows geometric descriptors alone already reach R² = 0.935-0.953 for the capacity targets, with RDF descriptors contributing the largest incremental gain. The building-block leakage check (`leakage_check_results.csv`, `leakage_check_group_summary.txt`) uses a group-aware split so no shared metal-node or linker token crosses train/test; because the two combinatorially-assembled data sources (81% of the database) each collapse into a single connected component under that constraint, the resulting group-split test set is drawn almost entirely (88%) from a structurally distinct source, making it an out-of-family generalization stress test rather than a narrow leakage probe. Test R² under that stricter split is 0.941/0.951/0.838/0.737 (CO₂ uptake/WC/selectivity/HoA), versus 0.981/0.985/0.975/0.817 under the primary random split reported above. See Supplementary Tables S5-S6 and manuscript Sections 2.4/3.2/3.6 for full discussion.
+
 ---
 
 Uncertainty quantification
