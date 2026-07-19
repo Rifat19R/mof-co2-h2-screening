@@ -12,7 +12,7 @@ Corresponding author: rifatkh.duet@gmail.com
 
 Target journal: *Digital Discovery*, Royal Society of Chemistry
 
-Data archive: https://doi.org/10.5281/zenodo.20305725
+Data archive: https://doi.org/10.5281/zenodo.20305724
 
 ---
 
@@ -152,8 +152,8 @@ Repository structure
 
 The processed feature matrix, trained models, fixed split indices, computed outputs, and candidate lists are all archived on Zenodo:
 
-DOI: `10.5281/zenodo.20305725`
-URL: https://doi.org/10.5281/zenodo.20305725
+DOI: `10.5281/zenodo.20305724`
+URL: https://doi.org/10.5281/zenodo.20305724
 
 ---
 
@@ -259,8 +259,8 @@ Zenodo data archive:
   title  = {Data and trained models for ``Packing Efficiency Governs {CO$_2$/H$_2$} Selectivity in {MOFs}"},
   author = {Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Hossain, Sujan},
   year   = {2026},
-  doi    = {10.5281/zenodo.20305725},
-  url    = {https://doi.org/10.5281/zenodo.20305725}
+  doi    = {10.5281/zenodo.20305724},
+  url    = {https://doi.org/10.5281/zenodo.20305724}
 }
 ```
 
