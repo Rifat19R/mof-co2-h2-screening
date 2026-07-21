@@ -73,6 +73,17 @@ Held-out test set: 27,878 structures (10% of the database, stratified by CO₂ u
 | CO₂/H₂ selectivity | XGBoost, log(1+x) target | 0.975 (log-space) | 0.101 log units |
 | Heat of adsorption | Stacking ensemble | 0.817 | 0.552 kJ mol⁻¹ |
 
+Full baseline comparison against Ridge, Random Forest, MLP, and CGCNN (`baseline_comparison.csv`), matching Table 1 of the manuscript:
+
+| Target | XGBoost R² | Ridge R² | RF R² | MLP R² | CGCNN R² |
+|---|---|---|---|---|---|
+| CO₂ uptake | 0.981 | 0.900 | 0.943 | 0.983 | 0.742 |
+| Working capacity | 0.985 | 0.916 | 0.958 | 0.986 | 0.751 |
+| CO₂/H₂ selectivity | 0.975 (log) / 0.825 (raw) | 0.921 | 0.953 | 0.973 | 0.621 |
+| Heat of adsorption | 0.817 | 0.792 | 0.809 | 0.815 | 0.488 |
+
+MLP is marginally ahead of XGBoost on the capacity targets (< 0.002 R²) but XGBoost is retained as the primary model for exact TreeExplainer SHAP values and native quantile regression for conformal calibration (Section 2.9 / 3.2 of the manuscript). CGCNN trails substantially because local crystal graphs do not directly encode the pore-volume and surface-area descriptors that dominate these targets, not because graph architectures are broadly weaker.
+
 Three-fold cross-validation confirms stability: R² = 0.977 ± 0.000 (CO₂ uptake), 0.981 ± 0.000 (working capacity), 0.970 ± 0.000 (selectivity), 0.817 ± 0.002 (HoA). Seed-stability analysis across seeds 42, 0, and 123 gives R² variation below 0.002 for the three primary targets.
 
 The heat-of-adsorption model reaches a descriptor-level ceiling because charge coverage is sparse. This is stated clearly as a limitation, not hidden as model success.
