@@ -1,0 +1,20 @@
+# Large/local-only content not part of the published repo
+data/
+figures/
+inverse_mof/
+myenv/
+venv/
+Submission copies/
+supplementary/
+
+# Local working artifacts (logs, scratch scripts, loose figure renders)
+scripts/*.txt
+scripts/figures_main/
+scripts/figures_supp/
+scripts/15_update_zenodo.py
+scripts/15b_resume_zenodo_draft.py
+scripts/pareto_front_32.csv
+
+# Python
+__pycache__/
+*.pyc
