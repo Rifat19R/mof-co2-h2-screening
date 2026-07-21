@@ -4,9 +4,9 @@ This repository contains the analysis code and reproducibility archive links for
 
 Packing Efficiency Governs CO₂/H₂ Selectivity in Metal–Organic Frameworks: Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals Topology-Level Reticular Design Rules
 
-Authors: Md. Rifat Khandaker, Mohammad Asaduzzaman Chowdhury, Sujan Hossain
+Authors: Md. Rifat Khandaker (Department of Chemical Engineering), Mohammad Asaduzzaman Chowdhury (Department of Mechanical Engineering), Sujan Hossain (Department of Mechanical Engineering)
 
-Affiliation: Department of Chemical Engineering, Dhaka University of Engineering & Technology (DUET), Gazipur-1700, Bangladesh
+Affiliation: Dhaka University of Engineering & Technology (DUET), Gazipur-1700, Bangladesh
 
 Corresponding author: rifatkh.duet@gmail.com
 
@@ -47,7 +47,7 @@ At topology level, fof and fsc nets show consistently high median CO₂/H₂ sel
 
 Dataset and descriptors
 
-The workflow starts from the ARC-MOF database (Rosen et al., *Digital Discovery*, 2023), which reports 279,384 structures. Of these, 499 failed geometric/RAC/RDF feature computation and were dropped before assembly, and a further 107 had missing or non-finite target values and were dropped after assembly, for 606 discarded in total, leaving 278,778 retained structures.
+The workflow starts from the ARC-MOF database (Burner et al., *Chemistry of Materials*, 2023), which reports 279,384 structures. Of these, 499 failed geometric/RAC/RDF feature computation and were dropped before assembly, and a further 107 had missing or non-finite target values and were dropped after assembly, for 606 discarded in total, leaving 278,778 retained structures.
 
 The final descriptor matrix contains 77 features:
 
@@ -218,7 +218,7 @@ The reproducibility archive on Zenodo contains:
 
 The raw ARC-MOF adsorption data should be obtained directly from the original source:
 
-> Rosen, A. S. et al. ARC-MOF: a diverse database of metal-organic frameworks with DFT-quality electronic structure data and GCMC-computed gas adsorption isotherms. *Digital Discovery* 2, 1303–1315 (2023). https://doi.org/10.1039/D3DD00158J
+> Burner, J. et al. ARC–MOF: a diverse database of metal-organic frameworks with DFT-derived partial atomic charges and descriptors for machine learning. *Chemistry of Materials* 35, 900–916 (2023). https://doi.org/10.1021/acs.chemmater.2c02485
 
 ---
 
@@ -267,15 +267,17 @@ Zenodo data archive:
 ARC-MOF database:
 
 ```bibtex
-@article{rosen2023arcmof,
-  title   = {{ARC-MOF}: a diverse database of metal-organic frameworks with {DFT}-quality
-             electronic structure data and {GCMC}-computed gas adsorption isotherms},
-  author  = {Rosen, Andrew S. and others},
-  journal = {Digital Discovery},
-  volume  = {2},
-  pages   = {1303--1315},
+@article{burner2023arcmof,
+  title   = {{ARC-MOF}: a diverse database of metal-organic frameworks with {DFT}-derived
+             partial atomic charges and descriptors for machine learning},
+  author  = {Burner, Jake and Luo, Jun and White, Andrew and Mirmiran, Adam and Kwon, Ohmin
+             and Boyd, Peter G. and Maley, Stephen and Gibaldi, Marco and Simrod, Scott
+             and Ogden, Victoria and Woo, Tom K.},
+  journal = {Chemistry of Materials},
+  volume  = {35},
+  pages   = {900--916},
   year    = {2023},
-  doi     = {10.1039/D3DD00158J}
+  doi     = {10.1021/acs.chemmater.2c02485}
 }
 ```
 
