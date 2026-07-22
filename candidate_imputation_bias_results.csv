@@ -1,0 +1,13 @@
+quantity,value
+database_total_structures,278885.0
+database_imputed_fraction,0.9122
+database_real_charge_fraction,0.0878
+candidates_imputed_count_of_50,50.0
+candidates_imputed_fraction,1.0
+binomial_test_pvalue_vs_global_rate,0.0207
+hoa_std_real_charges,1.1179
+hoa_std_imputed_charges,2.0008
+hoa_std_ratio_imputed_over_real,1.79
+hoa_mean_real_charges,6.8723
+candidate_mean_gcmc_hoa,7.012
+candidate_hoa_z_vs_real_charge_group,0.125

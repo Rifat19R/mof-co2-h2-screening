@@ -1,0 +1,6 @@
+target,candidate_R2_corrected,candidate_R2_pearson_r2_previously_reported,candidate_MAE,MBE
+CO2_uptake,0.973,0.976,0.274,-0.054
+WC,0.985,0.987,0.339,-0.115
+Selectivity_raw,0.881,0.906,7.65,-2.578
+HoA,0.654,0.724,0.396,0.013
+Selectivity_log,0.888,0.915,0.042,
