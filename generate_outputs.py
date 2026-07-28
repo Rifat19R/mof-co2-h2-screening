@@ -257,6 +257,10 @@ else:
     except ImportError:
         print("  shap not installed — run: pip install shap")
         print("  Figures 6/7/8 will use synthetic placeholders until then.")
+    except OSError as e:
+        print(f"  shap/numba/llvmlite failed to load natively on this machine: {e}")
+        print("  Skipping SHAP here -- run it separately (e.g. via WSL) using the")
+        print("  same cached models in data/models/ and full_features.parquet.")
 
 # =============================================================================
 # STEP 6 — Conformal calibration
@@ -787,7 +791,7 @@ else:
         "charge_std": chg["charge_std"].values,
         "is_real":    np.ones(len(chg), dtype=int),
     })
-    n_imputed   = min(10000, len(df) - len(chg))
+    n_imputed   = max(0, min(10000, len(df) - len(chg)))
     imputed_chg = pd.DataFrame({
         "charge_std": np.full(n_imputed, imputed_val),
         "is_real":    np.zeros(n_imputed, dtype=int),

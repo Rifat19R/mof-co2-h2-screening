@@ -1,13 +1,25 @@
 split_type,fold_or_seed,target,R2,MAE
-3-fold CV (n_est=300),fold_1,CO2_uptake,0.976701,0.632505
-3-fold CV (n_est=300),fold_2,CO2_uptake,0.976595,0.635157
-3-fold CV (n_est=300),fold_3,CO2_uptake,0.976601,0.635407
-3-fold CV (n_est=300),fold_1,WC,0.981291,0.635337
-3-fold CV (n_est=300),fold_2,WC,0.981286,0.636538
-3-fold CV (n_est=300),fold_3,WC,0.981331,0.635608
-3-fold CV (n_est=300),fold_1,Selectivity,0.970114,0.110724
-3-fold CV (n_est=300),fold_2,Selectivity,0.970226,0.111286
-3-fold CV (n_est=300),fold_3,Selectivity,0.970084,0.111141
-3-fold CV (n_est=300),fold_1,HoA,0.815778,0.553047
-3-fold CV (n_est=300),fold_2,HoA,0.818133,0.549272
-3-fold CV (n_est=300),fold_3,HoA,0.816405,0.551361
+3-fold CV (n_est=300),fold_1,co2_uptake_mmol_g,0.977896,0.61871
+3-fold CV (n_est=300),fold_2,co2_uptake_mmol_g,0.977817,0.622189
+3-fold CV (n_est=300),fold_3,co2_uptake_mmol_g,0.977734,0.622699
+3-fold CV (n_est=300),fold_1,wc_mmol_g,0.982109,0.62403
+3-fold CV (n_est=300),fold_2,wc_mmol_g,0.981992,0.626749
+3-fold CV (n_est=300),fold_3,wc_mmol_g,0.982037,0.626235
+3-fold CV (n_est=300),fold_1,selectivity_co2h2,0.970857,0.108757
+3-fold CV (n_est=300),fold_2,selectivity_co2h2,0.970898,0.109514
+3-fold CV (n_est=300),fold_3,selectivity_co2h2,0.971036,0.109039
+3-fold CV (n_est=300),fold_1,heat_of_ads,0.816206,0.551367
+3-fold CV (n_est=300),fold_2,heat_of_ads,0.818442,0.5485
+3-fold CV (n_est=300),fold_3,heat_of_ads,0.816171,0.550857
+seed-stability,seed_42,co2_uptake_mmol_g,0.982213,0.555189
+seed-stability,seed_42,wc_mmol_g,0.985685,0.557747
+seed-stability,seed_42,selectivity_co2h2,0.975331,0.099229
+seed-stability,seed_42,heat_of_ads,0.816611,0.551788
+seed-stability,seed_0,co2_uptake_mmol_g,0.982327,0.553077
+seed-stability,seed_0,wc_mmol_g,0.985629,0.559408
+seed-stability,seed_0,selectivity_co2h2,0.97549,0.099353
+seed-stability,seed_0,heat_of_ads,0.81341,0.548953
+seed-stability,seed_123,co2_uptake_mmol_g,0.982548,0.549715
+seed-stability,seed_123,wc_mmol_g,0.985953,0.552864
+seed-stability,seed_123,selectivity_co2h2,0.975479,0.099431
+seed-stability,seed_123,heat_of_ads,0.817077,0.546741

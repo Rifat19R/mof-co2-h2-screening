@@ -46,11 +46,11 @@ OUT_SUPP.mkdir(exist_ok=True)
 # =============================================================================
 
 METRICS = {
-    "CO2_uptake":  {"R2": 0.981, "MAE": 0.564,
+    "CO2_uptake":  {"R2": 0.982, "MAE": 0.555,
                     "unit": r"mmol g$^{-1}$", "label": r"CO$_2$ Uptake"},
-    "WC":          {"R2": 0.985, "MAE": 0.567,
+    "WC":          {"R2": 0.986, "MAE": 0.558,
                     "unit": r"mmol g$^{-1}$", "label": "Working Capacity"},
-    "Selectivity": {"R2": 0.975, "MAE": 0.101,
+    "Selectivity": {"R2": 0.975, "MAE": 0.099,
                     "unit": "(log-space)",      "label": r"CO$_2$/H$_2$ Selectivity"},
     "HoA":         {"R2": 0.817, "MAE": 0.552,
                     "unit": r"kJ mol$^{-1}$",  "label": "Heat of Adsorption"},
@@ -548,7 +548,7 @@ def fig09_learning_curves():
     ax.set_ylabel("Test $R^2$")
     ax.set_ylim(0.65, 1.01)
     ax.set_title("Learning curves -- four adsorption targets\n"
-                 "(HoA plateaus at low training size; other targets keep improving)",
+                 "(HoA improves gradually across the full training range, without an early plateau)",
                  fontsize=10)
     ax.legend(fontsize=8.5, frameon=False)
     ax.axhline(METRICS["HoA"]["R2"], color=CB_COLORS[3],
@@ -566,42 +566,51 @@ def fig09_learning_curves():
 # =============================================================================
 
 def fig10_charge_imputation():
-    print("\n[Figure 10] Charge imputation effect")
+    print("\n[Figure 10] Charge extraction fix: broken pipeline vs. corrected")
     df = load_data("charge_data.csv")
+
+    # Corrected data: real, structure-specific charges for all 278,885
+    # structures (see 18_extract_real_repeat_charges.py). The pre-fix
+    # pipeline extracted real charges for only 24,483 structures (8.8%) and
+    # silently imputed a single constant (0.4112 e) for the remaining
+    # 91.2%, collapsing nearly all electrostatic signal in the feature
+    # matrix. Panel (a) shows what the broken pipeline actually produced;
+    # panel (b) shows the corrected, fully real distribution.
+    real_std_new = df["charge_std"].dropna()
+    imputed_val = 0.4112
+    n_broken_real = 24483
+    n_broken_imputed = 254295
+
+    old_feat_path = DATA_DIR / "full_features_PRE_CHARGE_FIX_BACKUP.parquet"
+    if old_feat_path.exists():
+        old_df = pd.read_parquet(old_feat_path, columns=["charge_std"])
+        old_real_std = old_df.loc[~np.isclose(old_df["charge_std"], imputed_val, atol=1e-6), "charge_std"]
+    else:
+        rng = np.random.default_rng(42)
+        old_real_std = pd.Series(rng.beta(2, 3, n_broken_real) * 0.8)
 
     fig, axes = plt.subplots(1, 2, figsize=(9, 4))
 
-    if (df is not None and "charge_std" in df.columns
-            and "is_real" in df.columns):
-        real_std    = df[df["is_real"] == 1]["charge_std"].dropna()
-        imputed_val = float(df[df["is_real"] == 0]["charge_std"].iloc[0])
-    else:
-        rng         = np.random.default_rng(42)
-        real_std    = pd.Series(rng.beta(2, 3, 24483) * 0.8)
-        imputed_val = 0.4112
-
-    axes[0].hist(real_std, bins=60, color=CB_COLORS[0], alpha=0.85,
-                 edgecolor="white", linewidth=0.3)
+    axes[0].axvline(imputed_val, color=CB_COLORS[3], lw=2.5,
+                    label=f"Imputed constant = {imputed_val:.4f} e\n({n_broken_imputed:,} structures)")
+    axes[0].hist(old_real_std, bins=60, color=CB_COLORS[0], alpha=0.6,
+                 edgecolor="none", label=f"Real charges recovered\n({n_broken_real:,} structures, 8.8%)")
     axes[0].set_xlabel("Charge Std Dev (e)")
     axes[0].set_ylabel("Count")
-    axes[0].set_title("(a) Real REPEAT charges\n(n = 24,483; 8.8% of database)",
-                      fontsize=10, loc="left", fontweight="bold")
+    axes[0].set_xlim(0, 1.2)
+    axes[0].set_title("(a) Pre-fix pipeline\nelectrostatic signal collapsed for 91.2%",
+                      fontsize=9.5, loc="left", fontweight="bold")
+    axes[0].legend(fontsize=7, frameon=False)
 
-    axes[1].axvline(imputed_val, color=CB_COLORS[3], lw=2.5,
-                    label=f"Imputed median = {imputed_val:.4f} e")
-    axes[1].hist(real_std, bins=60, color=CB_COLORS[0], alpha=0.4,
-                 edgecolor="none", label="Real distribution (reference)")
+    axes[1].hist(real_std_new, bins=60, color=CB_COLORS[2], alpha=0.85,
+                 edgecolor="white", linewidth=0.3)
     axes[1].set_xlabel("Charge Std Dev (e)")
     axes[1].set_ylabel("Count")
-    axes[1].set_title("(b) After median imputation\n(254,295 structures -> single value)",
-                      fontsize=10, loc="left", fontweight="bold")
-    axes[1].legend(fontsize=8, frameon=False)
-    axes[1].text(0.5, 0.6, "Electrostatic signal\ncollapsed to constant",
-                 transform=axes[1].transAxes, fontsize=9, color="#CC3311",
-                 ha="center", va="center",
-                 bbox=dict(boxstyle="round", fc="#FFF0F0", ec="#CC3311", alpha=0.9))
+    axes[1].set_xlim(0, 1.2)
+    axes[1].set_title(f"(b) Corrected pipeline\nreal REPEAT charges for all {len(real_std_new):,} structures (100%)",
+                      fontsize=9.5, loc="left", fontweight="bold")
 
-    fig.suptitle("REPEAT partial charge coverage: real vs. median-imputed structures",
+    fig.suptitle("REPEAT partial charge extraction: pre-fix (broken) vs. corrected pipeline",
                  fontsize=11)
     fig.tight_layout()
     save_fig(fig, OUT_MAIN, "Figure_10")
@@ -615,6 +624,12 @@ def fig11_pareto():
     print("\n[Figure 11] Pareto front")
     df_full = load_data("full_features.parquet")
     df_pf   = load_data("pareto_front.csv", from_scripts=True)
+    df_funnel = load_data("screening_funnel_counts.csv")
+    n_filtered_pool = 803
+    if df_funnel is not None and "stage" in df_funnel.columns:
+        sel_row = df_funnel[df_funnel["stage"].str.contains("Selectivity", na=False)]
+        if len(sel_row):
+            n_filtered_pool = int(sel_row["count"].iloc[0])
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -654,7 +669,7 @@ def fig11_pareto():
         f"Pareto front: Working Capacity vs. CO$_2$/H$_2$ Selectivity\n"
         f"278,778 ARC-MOF structures (hexbin density) | "
         f"{n_pf} Pareto-optimal highlighted\n"
-        f"(non-dominated front within the 803-structure filtered pool: "
+        f"(non-dominated front within the {n_filtered_pool:,}-structure filtered pool: "
         f"WC $\\geq$ 19.57 mmol g$^{{-1}}$ and selectivity $\\geq$ 130)",
         fontsize=9)
     ax.legend(fontsize=8, frameon=True, loc="upper right")

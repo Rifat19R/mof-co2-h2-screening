@@ -18,3 +18,8 @@ scripts/pareto_front_32.csv
 # Python
 __pycache__/
 *.pyc
+
+# Scratch workspace (large downloaded archives, extracted CIFs, one-off
+# investigation scripts) -- not part of the reproducible pipeline
+scratch_dft_charges/
+scratch_top10_ids.txt
