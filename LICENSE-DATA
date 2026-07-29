@@ -6,7 +6,7 @@ This license applies to all DATA and FIGURES in this repository, including:
   - figures/       (all manuscript and supplementary figures)
 
 Copyright (c) 2025 Md. Rifat Khandaker, Mohammad Asaduzzaman Chowdhury, Sujan Hossain
-Department of Chemical Engineering, DUET, Gazipur-1700, Bangladesh
+Dhaka University of Engineering & Technology (DUET), Gazipur-1700, Bangladesh
 
 =======================================================================
 
@@ -36,18 +36,17 @@ ATTRIBUTION REQUIREMENT
 
 If you use this data or figures, please cite:
 
-  Khandaker, M. R., Chowdhury, M. A., & Hossain, S. (2025).
-  Packing Efficiency Governs CO2/H2 Selectivity in Metal-Organic Frameworks:
-  Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals
-  Topology-Level Reticular Design Rules.
-  Communications Chemistry. https://doi.org/10.5281/zenodo.XXXXXXX
+  Khandaker, M. R., Chowdhury, M. A., & Hossain, S. (2026).
+  Packing efficiency governs CO2/H2 selectivity in machine-learning-screened
+  metal-organic frameworks.
+  Digital Discovery. Data archive: https://doi.org/10.5281/zenodo.20305724
 
 =======================================================================
 
 NOTE ON ARC-MOF SOURCE DATA
 
 The derived features and model outputs in this repository are based on the
-ARC-MOF database (Raza et al., Chem. Mater. 34, 2864-2884, 2022).
+ARC-MOF database (Burner, J. et al., Chem. Mater. 35, 900-916, 2023).
 Raw CIF structures and original GCMC adsorption data belong to the ARC-MOF
 authors and are subject to their original terms of use. This CC BY 4.0
 license applies only to the derived products created by the authors of this
@@ -55,5 +54,5 @@ repository.
 
 =======================================================================
 
-CODE in this repository (scripts/ directory) is separately licensed under
-the MIT License. See LICENSE for details.
+CODE in this repository (all .py scripts, at repository root) is separately
+licensed under the MIT License. See LICENSE for details.

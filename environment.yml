@@ -5,39 +5,39 @@ channels:
 
 dependencies:
   # Python
-  - python=3.10.12
+  - python>=3.12
 
   # Core ML
-  - xgboost=1.7.6
-  - lightgbm=3.3.5
-  - scikit-learn=1.3.0
-  - optuna=3.3.0
+  - xgboost>=2.0
+  - lightgbm>=4.0
+  - scikit-learn>=1.3
+  - optuna>=3.3
 
   # Data
-  - pandas=1.5.3
-  - numpy=1.24.3
-  - pyarrow=12.0.1       # for .parquet read/write
+  - pandas>=1.5
+  - numpy>=1.24
+  - pyarrow>=12.0       # for .parquet read/write
 
   # Chemistry
-  - rdkit=2023.03.3
-  - pymatgen=2023.8.10
+  - rdkit>=2023.03
+  - pymatgen>=2023.8
 
   # Interpretability
-  - shap=0.42.1
+  - shap>=0.42
 
   # Visualisation
-  - matplotlib=3.7.2
-  - seaborn=0.12.2
+  - matplotlib>=3.7
+  - seaborn>=0.12
 
   # Utilities
-  - tqdm=4.65.0
-  - joblib=1.3.1
-  - scipy=1.11.1
+  - tqdm>=4.65
+  - joblib>=1.3
+  - scipy>=1.11
 
   # pip-only packages
   - pip
   - pip:
-      - zeoplusplus==0.0.4   # Zeo++ Python bindings (geometric features)
+      - zeoplusplus>=0.0.4   # Zeo++ Python bindings (geometric features)
 
 # To create the environment:
 #   conda env create -f environment.yml
@@ -47,3 +47,6 @@ dependencies:
 #
 # To export your current environment (for reproducibility check):
 #   conda env export > environment_full.yml
+#
+# All scripts live at the repository root (no scripts/ subfolder) —
+# see README.md "Repository structure".
