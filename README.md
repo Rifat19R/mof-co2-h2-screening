@@ -2,7 +2,9 @@
 
 This repository contains the analysis code and reproducibility archive links for the manuscript:
 
-Packing Efficiency Governs CO₂/H₂ Selectivity in Metal–Organic Frameworks: Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals Topology-Level Reticular Design Rules
+Packing efficiency governs CO₂/H₂ selectivity in machine-learning-screened metal–organic frameworks
+
+(Previously titled "Packing Efficiency Governs CO₂/H₂ Selectivity in Metal–Organic Frameworks: Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals Topology-Level Reticular Design Rules" in an earlier resubmission round.)
 
 Authors: Md. Rifat Khandaker (Department of Chemical Engineering), Mohammad Asaduzzaman Chowdhury (Department of Mechanical Engineering), Sujan Hossain (Department of Mechanical Engineering)
 
@@ -71,7 +73,9 @@ Held-out test set: 27,878 structures (10% of the database, stratified by CO₂ u
 | CO₂ uptake | XGBoost | 0.982 | 0.555 mmol g⁻¹ |
 | Working capacity | XGBoost | 0.986 | 0.558 mmol g⁻¹ |
 | CO₂/H₂ selectivity | XGBoost, log(1+x) target | 0.975 (log-space) | 0.099 log units |
-| Heat of adsorption | Stacking ensemble | 0.817 | 0.552 kJ mol⁻¹ |
+| Heat of adsorption | XGBoost | 0.817 | 0.552 kJ mol⁻¹ |
+
+XGBoost is the reported model for all four targets. A stacking ensemble (XGBoost + LightGBM + Random Forest + Extra Trees, Ridge meta-learner; `19_hoa_stacking_ensemble.py`) was also tested for heat of adsorption and reaches a modestly higher R² = 0.822, but XGBoost is retained for exact TreeExplainer SHAP compatibility, native quantile regression for conformal calibration, and consistency across all four targets (manuscript Section 2.6).
 
 Full baseline comparison against Ridge, Random Forest, MLP, and CGCNN (`baseline_comparison.csv`), matching Table 1 of the manuscript:
 
@@ -82,7 +86,7 @@ Full baseline comparison against Ridge, Random Forest, MLP, and CGCNN (`baseline
 | CO₂/H₂ selectivity | 0.975 (log) / 0.866 (raw) | 0.923 | 0.954 | 0.972 | 0.621 |
 | Heat of adsorption | 0.817 | 0.793 | 0.809 | 0.815 | 0.488 |
 
-MLP is marginally ahead of XGBoost on the capacity targets (< 0.002 R²) but XGBoost is retained as the primary model for exact TreeExplainer SHAP values and native quantile regression for conformal calibration (Section 2.9 / 3.2 of the manuscript). CGCNN trails substantially because local crystal graphs do not directly encode the pore-volume and surface-area descriptors that dominate these targets, not because graph architectures are broadly weaker.
+MLP is marginally ahead of XGBoost on the capacity targets (< 0.002 R²) but XGBoost is retained as the primary model for exact TreeExplainer SHAP values and native quantile regression for conformal calibration (Section 2.9 / 3.2 of the manuscript). CGCNN trails substantially because local crystal graphs do not directly encode the pore-volume and surface-area descriptors that dominate these targets, not because graph architectures are broadly weaker; CGCNN also used its published default hyperparameters and was not tuned for this dataset, unlike the other baselines, so the comparison is an information-content check rather than a tuned-for-tuned benchmark (Section 2.9).
 
 Three-fold cross-validation confirms stability: R² = 0.978 ± 0.000 (CO₂ uptake), 0.982 ± 0.000 (working capacity), 0.971 ± 0.000 (selectivity), 0.817 ± 0.001 (HoA). Seed-stability analysis across seeds 42, 0, and 123 gives R² variation below 0.002 for the three primary targets (HoA range/mean = 0.0045, reflecting its lower R² denominator, not partition sensitivity).
 
@@ -243,6 +247,8 @@ Heat-of-adsorption prediction reaches a descriptor-level ceiling at R² ≈ 0.82
 
 Synthesizability scores indicate structural family precedent and established secondary building units. They do not prove that any specific hypothetical structure has already been synthesised or will be straightforward to realise experimentally. Experimental validation remains essential for the shortlisted candidates.
 
+The group-split accuracy above is a lower bound for out-of-family generalization, not the expected accuracy for the 50 priority candidates. Checking candidate structure IDs against the realized group-split assignment shows 49 of 50 fall on the training (in-family) side; one candidate falls on the held-out side, for which the group-split numbers, not the primary random-split numbers, are the relevant benchmark.
+
 ---
 
 Citation
@@ -253,9 +259,8 @@ Manuscript (update after publication):
 
 ```bibtex
 @article{khandaker2025mof,
-  title   = {Packing Efficiency Governs {CO$_2$/H$_2$} Selectivity in Metal--Organic Frameworks:
-             Uncertainty-Guided Machine Learning Screening of 278,778 Structures Reveals
-             Topology-Level Reticular Design Rules},
+  title   = {Packing efficiency governs {CO$_2$/H$_2$} selectivity in machine-learning-screened
+             metal--organic frameworks},
   author  = {Khandaker, Md. Rifat and Chowdhury, Mohammad Asaduzzaman and Hossain, Sujan},
   journal = {Digital Discovery},
   year    = {2025},
